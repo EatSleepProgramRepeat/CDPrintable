@@ -34,8 +34,8 @@ public class WebRequest {
     /**
      * Sends the request to the MusicBrainz API and returns the response.
      * @return The response from the MusicBrainz API.
-     * @throws IOException
-     * @throws URISyntaxException
+     * @throws IOException If an I/O error occurs. Usually happens when the HTTP status code is not 200.
+     * @throws URISyntaxException If the URL is invalid. HINT: Check for spaces in the URL.
      */
     public String sendRequest() throws IOException, URISyntaxException {
         HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();

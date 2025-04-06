@@ -40,7 +40,7 @@ public class WebRequestTest {
     }
 
     @Test
-    void testHttpErrorResponse() throws IOException, URISyntaxException {
+    void testHttpErrorResponse() throws IOException {
         try (MockWebServer server = new MockWebServer()) {
             server.enqueue(new MockResponse().setResponseCode(400));
             server.start();
