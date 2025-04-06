@@ -1,10 +1,14 @@
 package com.CDPrintable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 
 public class ProgramWindow {
     private final UserAgent userAgent;
+    private JLabel fullUserAgentLabel = new JLabel();
+
     ProgramWindow() {
         userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, "example@example.com");
 
@@ -78,42 +82,88 @@ public class ProgramWindow {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // User Agent settings:
-        JPanel userAgentPanel = new JPanel(new GridBagLayout());
+        JPanel userAgentPanel = new JPanel(new BorderLayout());
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
         JLabel userAgentLabel = new JLabel("User Agent:");
         JTextField userAgentField = new JTextField(15);
+        userAgentField.setText(userAgent.getUserAgent());
+        userAgentField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {}   // Not used
+        });
 
         JLabel userAgentEmailLabel = new JLabel("User Agent Email:");
         JTextField userAgentEmailField = new JTextField(15);
+        userAgentEmailField.setText(userAgent.getUserAgentEmail());
+        userAgentEmailField.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {}   // Not used
+        });
+
+        fullUserAgentLabel = new JLabel(userAgent.toString());
 
         // Font settings
         JPanel fontPanel = new JPanel(new GridBagLayout());
         fontPanel.setBorder(BorderFactory.createTitledBorder("Font"));
 
         JLabel fontLabel = new JLabel("Font:");
-        JTextField fontField = new JTextField(15);
+        JTextField fontField = new JTextField(30);
 
         JLabel fontSizeLabel = new JLabel("Font Size:");
-        JTextField fontSizeField = new JTextField(15);
+        JTextField fontSizeField = new JTextField(30);
+        
+        JPanel userAgentInputPanel = new JPanel(new GridBagLayout());
+        JPanel fullAgentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         // Add all components to their panels
         gbc.gridx = 0;
         gbc.gridy = 0;
-        userAgentPanel.add(userAgentLabel, gbc);
+        userAgentInputPanel.add(userAgentLabel, gbc);
         fontPanel.add(fontLabel, gbc);
+
         gbc.gridx = 1;
-        userAgentPanel.add(userAgentField, gbc);
+        userAgentInputPanel.add(userAgentField, gbc);
         fontPanel.add(fontField, gbc);
+
         gbc.gridx = 0;
         gbc.gridy = 1;
-        userAgentPanel.add(userAgentEmailLabel, gbc);
+        userAgentInputPanel.add(userAgentEmailLabel, gbc);
         fontPanel.add(fontSizeLabel, gbc);
+
         gbc.gridx = 1;
-        userAgentPanel.add(userAgentEmailField, gbc);
+        userAgentInputPanel.add(userAgentEmailField, gbc);
         fontPanel.add(fontSizeField, gbc);
 
-        // Add subpanels to main panel
+        userAgentInputPanel.add(fullUserAgentLabel, gbc);
+        fullAgentPanel.add(fullUserAgentLabel);
+
+        // Add panels to the UA main panel
+        userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
+        userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
+
+        // Add sub panels to main panel
         panel.add(userAgentPanel);
         panel.add(fontPanel);
 
