@@ -1,0 +1,26 @@
+name: Run Tests on PR
+
+on:
+  pull_request:
+    branches:
+      - main  # or 'master', or whatever your main branch is
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '22'  # or your project's Java version
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build and run tests
+        run: ./gradlew test
