@@ -3,27 +3,28 @@ package com.CDPrintable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class ProgramWindow {
     private final UserAgent userAgent;
     private JLabel fullUserAgentLabel = new JLabel();
 
-    ProgramWindow() {
+    public ProgramWindow() {
         userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, "example@example.com");
 
-        JFrame frame = new JFrame("CD Printable");
+        JFrame frame = new JFrame("CD Printable v"+Constants.VERSION);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(1000, 600);
         frame.setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
         JPanel tablePanel = tablePanel();
-        JPanel findCDPanel = findCDPanel();
+        JPanel findCDPanel = searchPanel();
         JPanel settingsPanel = settingsPanel();
 
+        tabbedPane.addTab("Search", findCDPanel);
         tabbedPane.addTab("Table", tablePanel);
-        tabbedPane.addTab("Find CD", findCDPanel);
         tabbedPane.addTab("Settings", settingsPanel);
 
         frame.add(tabbedPane, BorderLayout.CENTER);
@@ -31,7 +32,7 @@ public class ProgramWindow {
         // Set the frame to be visible
         frame.setVisible(true);
     }
-    public JPanel tablePanel() {
+    private JPanel tablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Set up all the tables for the cd
@@ -44,18 +45,17 @@ public class ProgramWindow {
 
         return panel;
     }
-    public JPanel findCDPanel() {
+    private JPanel searchPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
         // Track List panel set up
         JPanel trackListPanel = new JPanel(new BorderLayout());
-        trackListPanel.setBorder(BorderFactory.createTitledBorder("Track List"));
+        trackListPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
 
-        // Track List table set up
-        String[] columnNames = {"Track Number", "Track Name", "Track Length"};
-        JTable trackListTable = new JTable(new String[][] {new String[] {"None", "", ""}}, columnNames);
-        JScrollPane trackListScrollPane = new JScrollPane(trackListTable);
+        // Search table set up
+        JTable searchTable = new JTable(getCDStubModel());
+        JScrollPane trackListScrollPane = new JScrollPane(searchTable);
         trackListPanel.add(trackListScrollPane, BorderLayout.CENTER);
 
         // Add the Track List panel to the main panel
@@ -63,10 +63,26 @@ public class ProgramWindow {
 
         // CD Search Panel set up
         JPanel cdSearchPanel = new JPanel();
-        cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search for CD"));
+        cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
         JTextField searchField = new JTextField(15);
+        JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist",  "Release"});
         JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(e -> {
+            if (searchTypeComboBox.getSelectedItem() == null) {
+                return;
+            }
+            if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
+                searchTable.setModel(getCDStubModel());
+            } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
+                searchTable.setModel(getArtistModel());
+            } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
+                searchTable.setModel(getReleaseModel());
+            } else {
+                JOptionPane.showMessageDialog(panel, "Please select a search type.");
+            }
+        });
         cdSearchPanel.setLayout(new FlowLayout());
+        cdSearchPanel.add(searchTypeComboBox);
         cdSearchPanel.add(searchField);
         cdSearchPanel.add(searchButton);
 
@@ -75,7 +91,26 @@ public class ProgramWindow {
 
         return panel;
     }
-    public JPanel settingsPanel() {
+
+    private DefaultTableModel getCDStubModel() {
+        String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
+        String[][] data = {{"", "", "", ""}};
+        return new javax.swing.table.DefaultTableModel(data, columnNames);
+    }
+
+    private DefaultTableModel getArtistModel() {
+        String[] columnNames = {"Artist Name", "Date Organised", ""};
+        String[][] data = {{"", "", ""}};
+        return new javax.swing.table.DefaultTableModel(data, columnNames);
+    }
+
+    private DefaultTableModel getReleaseModel() {
+        String[] columnNames = {"Release Name", "Artist", "Track Count", ""};
+        String[][] data = {{"", "", "", ""}};
+        return new javax.swing.table.DefaultTableModel(data, columnNames);
+    }
+
+    private JPanel settingsPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
