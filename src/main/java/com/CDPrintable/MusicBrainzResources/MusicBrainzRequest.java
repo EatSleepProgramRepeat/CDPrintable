@@ -8,7 +8,7 @@
  * This class helps you build a URL request to the MusicBrainz API.
  */
 
-package com.CDPrintable;
+package com.CDPrintable.MusicBrainzResources;
 
 /**
  * A class that helps you build a URL request to the MusicBrainz API.
