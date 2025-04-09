@@ -1,5 +1,5 @@
 import com.CDPrintable.Constants;
-import com.CDPrintable.MusicBrainzRequest;
+import com.CDPrintable.MusicBrainzResources.MusicBrainzRequest;
 import com.CDPrintable.UserAgent;
 import com.CDPrintable.WebRequest;
 import okhttp3.mockwebserver.MockResponse;
