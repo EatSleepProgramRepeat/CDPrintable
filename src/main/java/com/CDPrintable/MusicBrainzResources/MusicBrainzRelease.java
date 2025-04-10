@@ -13,14 +13,14 @@ package com.CDPrintable.MusicBrainzResources;
 public class MusicBrainzRelease {
     private String title;
     private String[] artists;
-    private int year;
+    private String date;
     private int trackCount;
     private String id;
 
-    public MusicBrainzRelease(String title, String[] artists, int year, int trackCount, String id) {
+    public MusicBrainzRelease(String title, String[] artists, String date, int trackCount, String id) {
         this.title = title;
         this.artists = artists;
-        this.year = year;
+        this.date = date;
         this.trackCount = trackCount;
         this.id = id;
     }
@@ -41,6 +41,22 @@ public class MusicBrainzRelease {
         this.title = title;
     }
 
+    public String[] getArtists() {
+        return artists;
+    }
+
+    public void setArtists(String[] artists) {
+        this.artists = artists;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public int getTrackCount() {
         return trackCount;
     }
@@ -55,21 +71,5 @@ public class MusicBrainzRelease {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String[] getArtists() {
-        return artists;
-    }
-
-    public void setArtists(String[] artists) {
-        this.artists = artists;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
     }
 }
