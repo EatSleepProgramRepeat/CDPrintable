@@ -11,34 +11,48 @@
 package com.CDPrintable.MusicBrainzResources;
 
 public class MusicBrainzCDStub {
-    public String discID;
-    public String discTitle;
-    public String discArtist;
-    public int trackCount;
-    public int releaseYear;
+    private String id;
+    private String title;
+    private String[] artists;
+    private int trackCount;
 
-    public MusicBrainzCDStub(String discID, String discTitle, String discArtist, int trackCount, int releaseYear) {
-        this.discID = discID;
-        this.discTitle = discTitle;
-        this.discArtist = discArtist;
+    public MusicBrainzCDStub(String id, String title, String[] artists, int trackCount) {
+        this.id = id;
+        this.title = title;
+        this.artists = artists;
         this.trackCount = trackCount;
-        this.releaseYear = releaseYear;
     }
 
-    public String getDiscTitle() {
-        return discTitle;
+    public String getArtistsAsString() {
+        StringBuilder sb = new StringBuilder();
+        for (String artist : artists) {
+            sb.append(artist).append(", ");
+        }
+        return sb.substring(0, sb.length() - 2);
     }
 
-    public void setDiscTitle(String discTitle) {
-        this.discTitle = discTitle;
+    public String getId() {
+        return id;
     }
 
-    public String getDiscArtist() {
-        return discArtist;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setDiscArtist(String discArtist) {
-        this.discArtist = discArtist;
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String[] getArtists() {
+        return artists;
+    }
+
+    public void setArtists(String[] artists) {
+        this.artists = artists;
     }
 
     public int getTrackCount() {
@@ -47,21 +61,5 @@ public class MusicBrainzCDStub {
 
     public void setTrackCount(int trackCount) {
         this.trackCount = trackCount;
-    }
-
-    public int getReleaseYear() {
-        return releaseYear;
-    }
-
-    public void setReleaseYear(int releaseYear) {
-        this.releaseYear = releaseYear;
-    }
-
-    public String getDiscID() {
-        return discID;
-    }
-
-    public void setDiscID(String discID) {
-        this.discID = discID;
     }
 }
