@@ -10,6 +10,11 @@
 
 package com.CDPrintable;
 
+import com.CDPrintable.MusicBrainzResources.MusicBrainzCDStub;
+import com.CDPrintable.MusicBrainzResources.MusicBrainzJSONReader;
+import com.CDPrintable.MusicBrainzResources.MusicBrainzRelease;
+import com.CDPrintable.MusicBrainzResources.MusicBrainzRequest;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -69,13 +74,13 @@ public class ProgramWindow {
         trackListPanel.add(trackListScrollPane, BorderLayout.CENTER);
 
         // Add the Track List panel to the main panel
-        panel.add(trackListPanel, BorderLayout.NORTH);
+        panel.add(trackListPanel, BorderLayout.CENTER);
 
         // CD Search Panel set up
         JPanel cdSearchPanel = new JPanel();
         cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
         JTextField searchField = new JTextField(15);
-        JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist",  "Release"});
+        JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
         JButton searchButton = new JButton("Search");
         searchButton.addActionListener(e -> {
             if (searchTypeComboBox.getSelectedItem() == null) {
@@ -83,10 +88,19 @@ public class ProgramWindow {
             }
             if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
                 searchTable.setModel(getCDStubModel());
+                MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
+
+
+                MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
             } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
                 searchTable.setModel(getArtistModel());
             } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
                 searchTable.setModel(getReleaseModel());
+                MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
+
+                MusicBrainzRelease[] releases = reader.getReleases();
+                searchTable.setModel(reader.getReleasesAsTableModel(releases));
             } else {
                 JOptionPane.showMessageDialog(panel, "Please select a search type.");
             }
@@ -102,6 +116,23 @@ public class ProgramWindow {
         return panel;
     }
 
+    private MusicBrainzJSONReader sendRequest(String queryType, String query) {
+        MusicBrainzRequest request = new MusicBrainzRequest(queryType, query);
+        WebRequest webRequest = new WebRequest(request, userAgent);
+
+        String response = null;
+        try {
+            response = webRequest.sendRequest();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, "There was a fatal error when sending the request. Please try again or submit an issue on GitHub.\nHere are some things to try:\n" +
+                    "• Check your internet connection.\n" +
+                    "• Remove any special characters from your query.");
+        }
+
+        MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
+        return reader;
+    }
+
     private DefaultTableModel getCDStubModel() {
         String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
         String[][] data = {{"", "", "", ""}};
@@ -115,7 +146,7 @@ public class ProgramWindow {
     }
 
     private DefaultTableModel getReleaseModel() {
-        String[] columnNames = {"Release Name", "Artist", "Track Count", ""};
+        String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
         String[][] data = {{"", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
