@@ -1,0 +1,223 @@
+{
+  "created": "2025-04-11T00:28:16.657Z",
+  "count": 76474,
+  "offset": 0,
+  "cdstubs": [
+    {
+      "id": "hU2FJcnlVtratcrOn9rAhPzzCMo-",
+      "score": 100,
+      "count": 8,
+      "title": "Songs From The Big Chair",
+      "artist": "Tears For Fears",
+      "barcode": "042282430021"
+    },
+    {
+      "id": "xVi83ZdOL7GX8FO7dxF9ti2Lzbk-",
+      "score": 100,
+      "count": 8,
+      "title": "Songs From The Big Chair",
+      "artist": "Tears For Fears",
+      "barcode": ""
+    },
+    {
+      "id": ".ycXLR2CzQVukjwAvD_qgp7U3FI-",
+      "score": 46,
+      "count": 13,
+      "title": "Songs From A Yellow Chair",
+      "artist": "Brendan Devereux",
+      "barcode": "5392000022416",
+      "disambiguation": "CD Baby id:bdevereux"
+    },
+    {
+      "id": "zuTQI.tG80P_djHrJq7McHi7I_s-",
+      "score": 41,
+      "count": 10,
+      "title": "Songs from the big house",
+      "artist": "The Hushpuppies Band",
+      "barcode": "",
+      "disambiguation": "CD Baby id:hushpuppies"
+    },
+    {
+      "id": "dCGMCb7HUKpxANsfs4Dyp9iWqIg-",
+      "score": 41,
+      "count": 10,
+      "title": "Songs From The Big Martin",
+      "artist": "Rob Berretta",
+      "barcode": "783707114200",
+      "disambiguation": "CD Baby id:robberretta"
+    },
+    {
+      "id": "ibRD5gD6LEbhT5seZwZB7xnnOmA-",
+      "score": 40,
+      "count": 30,
+      "title": "Songs From Under The Big Top",
+      "artist": "Jojo's Circus",
+      "barcode": ""
+    },
+    {
+      "id": "zn6WneZCL2JN_9Imv6kuGFtJbNM-",
+      "score": 39,
+      "count": 19,
+      "title": "Songs From the Big Hat: a Community Helper Album",
+      "artist": "Geof Johnson",
+      "barcode": "",
+      "disambiguation": "CD Baby id:geofjohnson"
+    },
+    {
+      "id": "c8dIwn.EcofZDz5Ou0dNt2q_A_Y-",
+      "score": 39,
+      "count": 13,
+      "title": "Songs From The Big Tent",
+      "artist": "Cowboys & Indians  W/ Eddie Cunningham",
+      "barcode": "634479274619",
+      "disambiguation": "CD Baby id:ecunningham4"
+    },
+    {
+      "id": "C_0ayMV8.KJ6XAoiS2A.1EGqdR4-",
+      "score": 39,
+      "count": 16,
+      "title": "From the chair",
+      "artist": "Melodic",
+      "barcode": "634479075902",
+      "disambiguation": "CD Baby id:melodic"
+    },
+    {
+      "id": "dyWmDcXrrOuRajKNdkK6QvOnaqQ-",
+      "score": 39,
+      "count": 24,
+      "title": "Songs from Jim Henson's Bear in the Big Blue House",
+      "artist": "Jim Henson",
+      "barcode": "724352785421"
+    },
+    {
+      "id": "_nL7a3y9gP1xM7MVbLTCnGSwTzo-",
+      "score": 38,
+      "count": 11,
+      "title": "From the Second Chair",
+      "artist": "Evan McHugh",
+      "barcode": "677516570923",
+      "disambiguation": "CD Baby id:evanmchugh"
+    },
+    {
+      "id": "cWAE4p4cIBuIwrDQMhAxk.lMpDI-",
+      "score": 38,
+      "count": 13,
+      "title": "On the River Road - Songs from the Big Bend",
+      "artist": "Joe Kuban and the Lost Chizo Band",
+      "barcode": ""
+    },
+    {
+      "id": "EB7cRXX2X468akkxdlLlIzNy3Gk-",
+      "score": 36,
+      "count": 10,
+      "title": "Campfire Songs from Los Angeles",
+      "artist": "Big Harmonica Bob",
+      "barcode": "634479314377",
+      "disambiguation": "CD Baby id:bigbob3"
+    },
+    {
+      "id": "cDX6Bkd2t.WXzepz5b31tNGHIRk-",
+      "score": 34,
+      "count": 5,
+      "title": "Yoga From Your Chair",
+      "artist": "Maureen Lewison",
+      "barcode": "634479494123",
+      "disambiguation": "CD Baby id:lewison2"
+    },
+    {
+      "id": "Qe8ui_uWl_EbhYRZ80MCnOMS.sw-",
+      "score": 31,
+      "count": 14,
+      "title": "The Electric Chair",
+      "artist": "The Electric Chair",
+      "barcode": "634479648779",
+      "disambiguation": "CD Baby id:electricchair"
+    },
+    {
+      "id": "H1g2radf1mLliLAHoNGFk_WNLtA-",
+      "score": 30,
+      "count": 15,
+      "title": "Live From The Back Of A Big, Big Boat",
+      "artist": "Cory Heydon",
+      "barcode": "634479134715",
+      "disambiguation": "CD Baby id:coryheydon2"
+    },
+    {
+      "id": "PUDYvw.Sbu11BabJKSric_oojsk-",
+      "score": 30,
+      "count": 13,
+      "title": "Merry Christmas From The Bigg Man",
+      "artist": "Bigg Robb & Da Problem Solvas",
+      "barcode": "634479056499",
+      "disambiguation": "CD Baby id:biggrobb3"
+    },
+    {
+      "id": "UtxdpN0a3Vw.BctD.yrI36meSog-",
+      "score": 30,
+      "count": 28,
+      "title": "Authentic Songs Of The Old West",
+      "artist": "Big Tex",
+      "barcode": "628740651025",
+      "disambiguation": "CD Baby id:bigtex"
+    },
+    {
+      "id": "V8FgiMq2KOti1FU.Jw4ZTnpZXBc-",
+      "score": 29,
+      "count": 15,
+      "title": "From The Heart",
+      "artist": "Big Sicks LES",
+      "barcode": "600385158220",
+      "disambiguation": "CD Baby id:bigsicksles"
+    },
+    {
+      "id": "PAEoG.rnXfuYI56Flo9SXZ3ZFmE-",
+      "score": 29,
+      "count": 11,
+      "title": "Big Guitars From Memphis",
+      "artist": "Big Guitars From Memphis",
+      "barcode": ""
+    },
+    {
+      "id": "QKTE8faC9kj9AScuGn.SkD1aFns-",
+      "score": 29,
+      "count": 12,
+      "title": "Songs From Mars",
+      "artist": "The Dude From Mars",
+      "barcode": "643157325321",
+      "disambiguation": "CD Baby id:dudefrommars"
+    },
+    {
+      "id": "zaVgvlXaGtSzh7OKMr9g0Y73rvQ-",
+      "score": 29,
+      "count": 10,
+      "title": "From the Bestiary to the Leathering Room",
+      "artist": "Big John Bates",
+      "barcode": "4260108237555"
+    },
+    {
+      "id": "OM.Fg73TG4F3Uzh7W7hgmt7jsMo-",
+      "score": 29,
+      "count": 20,
+      "title": "Pure Ballads: The Biggest Love Songs (Disc 1)",
+      "artist": "",
+      "barcode": ""
+    },
+    {
+      "id": "zzlGgrhBYLxg2fN2S1AEoDFEjTs-",
+      "score": 29,
+      "count": 16,
+      "title": "The Big City Bob Songs",
+      "artist": "Bobby Rivers",
+      "barcode": "634479478321",
+      "disambiguation": "CD Baby id:bobbyrivers12"
+    },
+    {
+      "id": "nNAKk2xlu4dHNa.Xbf9FxG7KAbU-",
+      "score": 29,
+      "count": 19,
+      "title": "Pure Ballads The Biggest Love Songs (disc 2)",
+      "artist": "",
+      "barcode": ""
+    }
+  ]
+}

@@ -5,22 +5,24 @@
  * This source code is licensed under the GNU General Public License v3.0
  * found in the LICENSE file in the root directory of this source tree.
  *
- * This is a class that stores data from the JSON reader.
+ * This is a class that stores release data from the JSON reader.
  */
 
 package com.CDPrintable.MusicBrainzResources;
 
-public class MusicBrainzCDStub {
-    private String id;
+public class MusicBrainzRelease {
     private String title;
     private String[] artists;
+    private String date;
     private int trackCount;
+    private String id;
 
-    public MusicBrainzCDStub(String id, String title, String[] artists, int trackCount) {
-        this.id = id;
+    public MusicBrainzRelease(String title, String[] artists, String date, int trackCount, String id) {
         this.title = title;
         this.artists = artists;
+        this.date = date;
         this.trackCount = trackCount;
+        this.id = id;
     }
 
     public String getArtistsAsString() {
@@ -29,14 +31,6 @@ public class MusicBrainzCDStub {
             sb.append(artist).append(", ");
         }
         return sb.substring(0, sb.length() - 2);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getTitle() {
@@ -55,11 +49,27 @@ public class MusicBrainzCDStub {
         this.artists = artists;
     }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
     public int getTrackCount() {
         return trackCount;
     }
 
     public void setTrackCount(int trackCount) {
         this.trackCount = trackCount;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
