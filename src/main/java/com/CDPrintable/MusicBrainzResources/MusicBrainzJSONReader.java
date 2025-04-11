@@ -13,6 +13,7 @@ package com.CDPrintable.MusicBrainzResources;
 import com.google.gson.*;
 
 import javax.swing.table.DefaultTableModel;
+import java.lang.reflect.Array;
 
 public class MusicBrainzJSONReader {
     private final JsonObject json;
@@ -22,9 +23,11 @@ public class MusicBrainzJSONReader {
         this.json = jsonElement.getAsJsonObject();
     }
 
+    @SuppressWarnings("unchecked")
     private <T> T[] parseJsonArray(String key, JsonArrayProcessor<T> processor, T[] array) {
         if (!json.has(key)) {return null;}
         JsonArray jsonArray = json.getAsJsonArray(key);
+        array = (T[]) Array.newInstance(array.getClass().getComponentType(), jsonArray.size());
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
@@ -38,55 +41,32 @@ public class MusicBrainzJSONReader {
     * @return An array of the releases.
      */
     public MusicBrainzRelease[] getReleases() {
-        MusicBrainzRelease[] releaseArray = null;
-        if (json.has("releases")) {
-            // Main array for all releases
-            JsonArray releases = json.getAsJsonArray("releases");
-            releaseArray = new MusicBrainzRelease[releases.size()];
+        return parseJsonArray("releases", jsonObject -> {
+            String title = jsonObject.has("title") ? jsonObject.get("title").getAsString() : null;
+            String date = jsonObject.has("date") ? jsonObject.get("date").getAsString() : null;
+            int trackCount = jsonObject.has("count") ? jsonObject.get("count").getAsInt() : -1;
+            String id = jsonObject.has("id") ? jsonObject.get("id").getAsString() : null;
 
-            for (int i = 0; i < releases.size(); i++) {
-                JsonObject release = releases.get(i).getAsJsonObject();
-                JsonArray artistsJson = release.has("artist-credit") ? release.getAsJsonArray("artist-credit") : null;
-                String title = release.has("title") ? release.get("title").getAsString() : null;
-
-                // Get artists
-                String[] artists = null;
-                if (artistsJson != null) {
-                    artists = new String[artistsJson.size()];
-                    for (int j = 0; j < artistsJson.size(); j++) {
-                        artists[j] = artistsJson.get(j).getAsJsonObject().get("name").getAsString();
-                    }
-                }
-
-                String date = release.has("date") ? release.get("date").getAsString() : null;
-                int trackCount = release.has("track_count") ? release.get("track_count").getAsInt() : 0;
-                String id = release.has("id") ? release.get("id").getAsString() : null;
-
-                releaseArray[i] = new MusicBrainzRelease(title, artists, date, trackCount, id);
+            JsonArray artistsArray = jsonObject.getAsJsonArray("artist-credit");
+            String[] artists = new String[artistsArray.size()];
+            for (int j = 0; j < artistsArray.size(); j++) {
+                JsonObject artistObject = artistsArray.get(j).getAsJsonObject();
+                JsonElement artistElement = artistObject.get("name");
+                artists[j] = artistElement != null ? artistElement.getAsString() : null;
             }
-        }
-        return releaseArray;
+
+            return new MusicBrainzRelease(title, artists, date, trackCount, id);
+        }, new MusicBrainzRelease[0]);
     }
 
     public MusicBrainzCDStub[] getCDStubs() {
-        MusicBrainzCDStub[] cdStubArray = null;
-        if (json.has("cdstubs")) {
-            JsonArray cdStubs = json.getAsJsonArray("cdstubs");
-            cdStubArray = new MusicBrainzCDStub[cdStubs.size()];
-
-            for (int i = 0; i < cdStubs.size(); i++) {
-                JsonObject stub = cdStubs.get(i).getAsJsonObject();
-                String artist = stub.has("artist") ? stub.get("artist").getAsString() : null;
-                String title = stub.has("title") ? stub.get("title").getAsString() : null;
-                String id = stub.has("id") ? stub.get("id").getAsString() : null;
-                int trackCount = stub.has("count") ? stub.get("count").getAsInt() : -1;
-
-                cdStubArray[i] = new MusicBrainzCDStub(id, title, new String[] {artist}, trackCount);
-            }
-
-            return cdStubArray;
-        }
-        return null;
+        return parseJsonArray("cdstubs", jsonObject -> {
+            String title = jsonObject.has("title") ? jsonObject.get("title").getAsString() : null;
+            String id = jsonObject.has("id") ? jsonObject.get("id").getAsString() : null;
+            int trackCount = jsonObject.has("count") ? jsonObject.get("count").getAsInt() : -1;
+            String artist = jsonObject.has("artist") ? jsonObject.get("artist").getAsString() : null;
+            return new MusicBrainzCDStub(id, title, new String[] {artist}, trackCount);
+        }, new MusicBrainzCDStub[0]);
     }
 
     /*
