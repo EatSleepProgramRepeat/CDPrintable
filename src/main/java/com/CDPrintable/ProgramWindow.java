@@ -124,9 +124,11 @@ public class ProgramWindow {
         try {
             response = webRequest.sendRequest();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "There was a fatal error when sending the request. Please try again or submit an issue on GitHub.\nHere are some things to try:\n" +
-                    "• Check your internet connection.\n" +
-                    "• Remove any special characters from your query.");
+            JOptionPane.showMessageDialog(null, """
+                    There was a fatal error when sending the request. Please try again or submit an issue on GitHub.
+                    Here are some things to try:
+                    • Check your internet connection.
+                    • Remove any special characters from your query.""");
         }
 
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
