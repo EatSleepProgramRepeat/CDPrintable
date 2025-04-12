@@ -1,0 +1,105 @@
+{
+  "created": "2025-04-10T17:40:09.895Z",
+  "count": 54960,
+  "offset": 0,
+  "releases": [
+    {
+      "id": "b47fb945-e576-4f89-bd83-8b5e809fbd0b",
+      "score": 100,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "packaging-id": "119eba76-b343-3e02-a292-f0f00644bb9b",
+      "count": 1,
+      "title": "Nights Like This",
+      "status": "Official",
+      "packaging": "None",
+      "text-representation": {
+        "language": "eng",
+        "script": "Latn"
+      },
+      "artist-credit": [
+        {
+          "name": "Witt Lowry",
+          "artist": {
+            "id": "0b4ce616-79c3-471c-9792-1b8767eca03a",
+            "name": "Witt Lowry",
+            "sort-name": "Lowry, Witt"
+          }
+        }
+      ],
+      "release-group": {
+        "id": "09cf8b07-f30e-47a4-b519-cf4e4a93f7c2",
+        "type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+        "primary-type-id": "d6038452-8ee0-3f68-affc-2de9a1ede0b9",
+        "title": "Nights Like This",
+        "primary-type": "Single"
+      },
+      "date": "2022-10-28",
+      "country": "XW",
+      "release-events": [
+        {
+          "date": "2022-10-28",
+          "area": {
+            "id": "525d4e18-3d00-31b9-a58b-a146a916de8f",
+            "name": "[Worldwide]",
+            "sort-name": "[Worldwide]",
+            "iso-3166-1-codes": [
+              "XW"
+            ]
+          }
+        }
+      ],
+      "barcode": "859767027191",
+      "label-info": [
+        {
+          "label": {
+            "id": "43f04ad4-1703-484f-a529-a0ba1932115b",
+            "name": "Witt Lowry"
+          }
+        }
+      ],
+      "track-count": 1,
+      "media": [
+        {
+          "format": "Digital Media",
+          "disc-count": 0,
+          "track-count": 1
+        }
+      ]
+    },
+    {
+      "id": "846ee5f9-ad18-4f3a-a883-43ec58ca0805",
+      "score": 100,
+      "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+      "count": 1,
+      "title": "Nights Like This",
+      "status": "Official",
+      "artist-credit": [
+        {
+          "name": "Kaylee Bell",
+          "artist": {
+            "id": "327a36ef-1065-4e76-96d6-b5a89c01a64d",
+            "name": "Kaylee Bell",
+            "sort-name": "Bell Kaylee",
+            "disambiguation": "singer from New Zealand"
+          }
+        }
+      ],
+      "release-group": {
+        "id": "b8ea2772-ad44-497f-b7dd-23cff0c85389",
+        "type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+        "title": "Nights Like This",
+        "primary-type": "Album"
+      },
+      "asin": "B0CSJX9KTB",
+      "track-count": 11,
+      "media": [
+        {
+          "format": "Digital Media",
+          "disc-count": 0,
+          "track-count": 11
+        }
+      ]
+    }
+  ]
+}
