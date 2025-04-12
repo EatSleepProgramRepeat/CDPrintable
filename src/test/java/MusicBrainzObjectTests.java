@@ -14,9 +14,13 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MusicBrainzObjectTests {
+    // Read example JSON files
     private final String releasesJson = readFile("src/test/resources/ReleaseExample.json");
     private final String cdStubsJson = readFile("src/test/resources/CDStubExample.json");
 
+    /**
+     * Test that the JSON reader can handle an invalid JSON string.
+     */
     @Test
     public void invalidJsonString() {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader("<xml></xml>");
@@ -28,6 +32,10 @@ public class MusicBrainzObjectTests {
         assertEquals(0, releases.length);
     }
 
+    /**
+     * Test that the JSON reader can handle an empty JSON string as well as invalid JSON.
+     * This might happen if the database is down.
+     */
     @ParameterizedTest
     @CsvSource({
             "{\"invalidKey\": []}, releases",
@@ -49,6 +57,11 @@ public class MusicBrainzObjectTests {
         }
     }
 
+    /**
+     * Test that the JSON reader can handle a JSON string with missing or null fields.
+     * This is a very common occurrence, however the server typically would return an
+     * empty String instead of null.
+     */
     @ParameterizedTest
     @CsvSource({
             "{\"releases\": [{\"title\": null, \"date\": null, \"count\": null, \"id\": null, \"artist-credit\": []}]}, releases",
@@ -79,16 +92,26 @@ public class MusicBrainzObjectTests {
         }
     }
 
+    /**
+     * Test the JSON reader against array issues. There are many cases tested here.
+     * Case 1: (CDStubs and Releases) The array is null.
+     * Case 2: (CDStubs and Releases) The array is empty.
+     * Case 3: (CDStubs and Releases) The array is still cooked but contains a null field.
+     * Case 4: (CDStubs and Releases) The array is still cooked but contains an invalid key.
+     * @param key The array key to test. (releases or cdstubs) (more to come)
+     * @param isNull Whether the array is null or not.
+     * @param readerJson The JSON string to test.
+     */
     @ParameterizedTest
     @CsvSource({
-            "releases, true, null",
-            "releases, false, {}",
-            "cdstubs, true, null",
-            "cdstubs, false, {}",
-            "releases, false, {\"releases\": null}",
-            "cdstubs, false, {\"cdstubs\": null}",
-            "releases, false, {\"invalidKey\": []}",
-            "cdstubs, false, {\"invalidKey\": []}"
+            "releases, true, null",                     // case 1
+            "releases, false, {}",                      // case 2
+            "cdstubs, true, null",                      // case 1
+            "cdstubs, false, {}",                       // case 2
+            "releases, false, {\"releases\": null}",    // case 3
+            "cdstubs, false, {\"cdstubs\": null}",      // case 3
+            "releases, false, {\"invalidKey\": []}",    // case 4
+            "cdstubs, false, {\"invalidKey\": []}"      // case 4
     })
     void testGetTableModelWithArrayIssues(String key, boolean isNull, String readerJson) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(readerJson != null ? readerJson : "");
@@ -107,6 +130,11 @@ public class MusicBrainzObjectTests {
         }
     }
 
+    /**
+     * Test the JSON reader against the example JSON files. This is effectively
+     * normal operation for the program.
+     * This test is for Releases.
+     */
     @Test
     void genericGetReleasesTest() {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(releasesJson);
@@ -130,6 +158,11 @@ public class MusicBrainzObjectTests {
         assertEquals("846ee5f9-ad18-4f3a-a883-43ec58ca0805", releases[1].getId());
     }
 
+    /**
+     * Test the JSON reader against the example JSON files. This is effectively
+     * normal operation for the program.
+     * This test is for CDStubs.
+     */
     @SuppressWarnings("SpellCheckingInspection")
     @Test
     void genericGetCDStubsTest() {
@@ -152,6 +185,11 @@ public class MusicBrainzObjectTests {
         assertEquals("KZn02eYalzdXJNbtmuz2xKDzLZU-", cdStubs[1].getId());
     }
 
+    /**
+     * Tests the JSON reader again, but requests a table model and tests that instead.
+     * This is effectively normal operation for the program.
+     * This test is for Releases.
+     */
     @Test
     void genericGetReleasesAsTableModelTest() {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(releasesJson);
@@ -175,6 +213,11 @@ public class MusicBrainzObjectTests {
         assertEquals("", tableModel.getValueAt(1, 4));
     }
 
+    /**
+     * Tests the JSON reader again, but requests a table model and tests that instead.
+     * This is effectively normal operation for the program.
+     * This test is for CDStubs.
+     */
     @Test
     void genericGetCDStubsAsTableModelTest() {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(cdStubsJson);
@@ -196,6 +239,12 @@ public class MusicBrainzObjectTests {
         assertEquals("", tableModel.getValueAt(1, 3));
     }
 
+    /**
+     * Read a file and return its contents as a String.
+     * This is a helper method used for the example JSON files.
+     * @param filePath The path to the file.
+     * @return The contents of the file as a String.
+     */
     private String readFile(String filePath) {
         try {
             return new String(Files.readAllBytes(Paths.get(filePath)));
