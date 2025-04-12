@@ -26,7 +26,7 @@ CDPrintable is a lightweight, easy-to-use program for generating and printing la
 
 ### Installation
 
-There are releases that are provided on GitHub. I suggest using those, but feel free to build from source if you want to. If you download it, you can execute the following command on windows or linux:
+I recommend using the jar file provided in releases. You may compile the source code yourself, but I find it way easier to just use the jar. Here is the command for Linux and Windows that will run the jar:
 
 ```bash
 java -jar CDPrintable.jar
@@ -90,7 +90,7 @@ The configuration file is a JSON file that contains the following fields:
 ## 🛠️ Built With
 
 - [Java](https://www.java.com/en/) - The programming language used.
-- [Gradle](https://gradle.org/) - Dependency Management.
+- [Gradle](https://gradle.org/) - Dependency Management, building, testing, and running. 
 - [Javax.Swing](https://docs.oracle.com/javase/8/docs/api/javax/swing/package-summary.html) - GUI framework.
 - [MusicBrainz API](https://musicbrainz.org/doc/MusicBrainz_API) - The API used to fetch data.
 - [Google Gson](https://github.com/google/gson) - JSON parsing.
