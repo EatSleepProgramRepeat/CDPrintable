@@ -26,6 +26,9 @@ public class ProgramWindow {
     private final UserAgent userAgent;
     private JLabel fullUserAgentLabel = new JLabel();
 
+    /**
+     * Creates a new ProgramWindow and sets up the GUI.
+     */
     public ProgramWindow() {
         userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, "example@example.com");
 
@@ -48,6 +51,11 @@ public class ProgramWindow {
         // Set the frame to be visible
         frame.setVisible(true);
     }
+
+    /**
+     * Gets a JPanel for the table panel. This is a helper method.
+     * @return A JPanel with the table panel.
+     */
     private JPanel tablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -61,6 +69,11 @@ public class ProgramWindow {
 
         return panel;
     }
+
+    /**
+     * Gets a JPanel for the search panel. This is a helper method.
+     * @return A JPanel with the search panel.
+     */
     private JPanel searchPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -87,7 +100,7 @@ public class ProgramWindow {
 
         // Search button and event listener setup
         JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> {
+        searchButton.addActionListener(_ -> {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
             }
@@ -147,24 +160,40 @@ public class ProgramWindow {
 
     }
 
+    /**
+     * Gets a default table model for CDStubs.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getCDStubModel() {
         String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
         String[][] data = {{"", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a default table model for Artists.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getArtistModel() {
         String[] columnNames = {"Artist Name", "Date Organised", ""};
         String[][] data = {{"", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a default table model for Releases.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getReleaseModel() {
         String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
         String[][] data = {{"", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a JPanel for settings. This is another helper method.
+     * @return A JPanel with the settings window.
+     */
     private JPanel settingsPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -175,6 +204,7 @@ public class ProgramWindow {
         JPanel userAgentPanel = new JPanel(new BorderLayout());
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
+        // Setup user agent text fields, labels, and document listeners
         JLabel userAgentLabel = new JLabel("User Agent:");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
@@ -193,11 +223,11 @@ public class ProgramWindow {
             public void changedUpdate(DocumentEvent e) {}   // Not used
         });
 
+        // Set up the user agent field with labels and document listener.
         JLabel userAgentEmailLabel = new JLabel("User Agent Email:");
         JTextField userAgentEmailField = new JTextField(15);
         userAgentEmailField.setText(userAgent.getUserAgentEmail());
         userAgentEmailField.getDocument().addDocumentListener(new DocumentListener() {
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
