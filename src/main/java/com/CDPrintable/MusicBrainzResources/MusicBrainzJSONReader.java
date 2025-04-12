@@ -14,18 +14,34 @@ import com.google.gson.*;
 
 import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 
 public class MusicBrainzJSONReader {
     private final JsonObject json;
 
-    public MusicBrainzJSONReader(String json) {
-        JsonElement jsonElement = JsonParser.parseString(json);
-        this.json = jsonElement.getAsJsonObject();
+    public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
+        JsonObject tempJsonObject;
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            tempJsonObject = jsonElement.getAsJsonObject();
+        } catch (JsonSyntaxException | IllegalStateException e) {
+            tempJsonObject = new JsonObject();
+        }
+        this.json = tempJsonObject;
     }
 
     @SuppressWarnings("unchecked")
     private <T> T[] parseJsonArray(String key, JsonArrayProcessor<T> processor, T[] array) {
-        if (!json.has(key)) {return null;}
+        if (!json.has(key)) {
+            array = (T[]) Array.newInstance(array.getClass().getComponentType(), 1);
+            try {
+                array[0] = (T) array.getClass().getComponentType().getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+            return array;
+        }
         JsonArray jsonArray = json.getAsJsonArray(key);
         array = (T[]) Array.newInstance(array.getClass().getComponentType(), jsonArray.size());
 
@@ -42,10 +58,10 @@ public class MusicBrainzJSONReader {
      */
     public MusicBrainzRelease[] getReleases() {
         return parseJsonArray("releases", jsonObject -> {
-            String title = jsonObject.has("title") ? jsonObject.get("title").getAsString() : null;
-            String date = jsonObject.has("date") ? jsonObject.get("date").getAsString() : null;
-            int trackCount = jsonObject.has("count") ? jsonObject.get("count").getAsInt() : -1;
-            String id = jsonObject.has("id") ? jsonObject.get("id").getAsString() : null;
+            String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
+            String date = jsonHasAndIsNotNull(jsonObject, "date") ? jsonObject.get("date").getAsString() : null;
+            int trackCount = jsonHasAndIsNotNull(jsonObject, "count") ? jsonObject.get("count").getAsInt() : -1;
+            String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
 
             JsonArray artistsArray = jsonObject.getAsJsonArray("artist-credit");
             String[] artists = new String[artistsArray.size()];
@@ -61,10 +77,11 @@ public class MusicBrainzJSONReader {
 
     public MusicBrainzCDStub[] getCDStubs() {
         return parseJsonArray("cdstubs", jsonObject -> {
-            String title = jsonObject.has("title") ? jsonObject.get("title").getAsString() : null;
-            String id = jsonObject.has("id") ? jsonObject.get("id").getAsString() : null;
-            int trackCount = jsonObject.has("count") ? jsonObject.get("count").getAsInt() : -1;
-            String artist = jsonObject.has("artist") ? jsonObject.get("artist").getAsString() : null;
+            String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
+            String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
+            int trackCount = jsonHasAndIsNotNull(jsonObject, "count") ? jsonObject.get("count").getAsInt() : -1;
+            String artist = jsonHasAndIsNotNull(jsonObject, "artist") ? jsonObject.get("artist").getAsString() : null;
+
             return new MusicBrainzCDStub(id, title, new String[] {artist}, trackCount);
         }, new MusicBrainzCDStub[0]);
     }
@@ -76,6 +93,9 @@ public class MusicBrainzJSONReader {
     * @param extractor The extractor that extracts the data from the item.
      */
     private DefaultTableModel createTableModel(Object[] items, String[] columnNames, DataExtractor extractor) {
+        if (items == null || items.length == 0) {
+            return new DefaultTableModel(new String[0][0], columnNames);
+        }
         String[][] data = new String[items.length][columnNames.length];
         for (int i = 0; i < items.length; i++) {
             data[i] = extractor.extractData(items[i]);
