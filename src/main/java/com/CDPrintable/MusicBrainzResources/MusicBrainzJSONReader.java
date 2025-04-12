@@ -91,6 +91,10 @@ public class MusicBrainzJSONReader {
         }, new MusicBrainzRelease[0]);
     }
 
+    /**
+     * Gets CD stubs from the JSON.
+     * @return An array of the CD stubs.
+     */
     public MusicBrainzCDStub[] getCDStubs() {
         return parseJsonArray("cdstubs", jsonObject -> {
             // Read the title, track count, and id from the JSON object
@@ -162,24 +166,38 @@ public class MusicBrainzJSONReader {
         });
     }
 
-    // Functional interfaces for extracting data from items
+    /**
+     * Functional interface for extracting data from an item.
+     */
     @FunctionalInterface
     private interface DataExtractor {
         String[] extractData(Object item);
     }
 
-    // Functional interface for processing JSON objects
+    /**
+     * Functional interface for processing a JSON object.
+     * @param <T> The type of the object to be processed.
+     */
     @FunctionalInterface
     private interface JsonArrayProcessor<T> {
         T process(JsonObject jsonObject);
     }
 
-    // Helper method to check if a JSON object has a member and is not null
+    /**
+     * Checks if a JSON object has a member and is not null.
+     * @param jsonObject The JSON object.
+     * @param memberName The member name to check for.
+     * @return True if the member exists and is not null, false otherwise.
+     */
     private boolean jsonHasAndIsNotNull(JsonObject jsonObject, String memberName) {
         return jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull();
     }
 
-    // Helper method to return a default value (n/a) if the value is null
+    /**
+     * Gets a value or returns "n/a" if the value is null.
+     * @param value The value to check.
+     * @return The value or "n/a" if the value is null.
+     */
     private String getOrDefault(String value) {
         return value != null ? value : "n/a";
     }
