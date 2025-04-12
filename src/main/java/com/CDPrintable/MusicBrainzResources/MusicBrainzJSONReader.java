@@ -119,4 +119,13 @@ public class MusicBrainzJSONReader {
     private interface JsonArrayProcessor<T> {
         T process(JsonObject jsonObject);
     }
+
+    private boolean jsonHasAndIsNotNull(JsonObject jsonObject, String memberName) {
+        return jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull();
+    }
+
+    @Override
+    public String toString() {
+        return json.toString();
+    }
 }
