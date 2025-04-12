@@ -17,7 +17,6 @@ import java.lang.reflect.Array;
 
 public class MusicBrainzJSONReader {
     private final JsonObject json;
-    private final String na = "n/a";
 
     public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
         JsonObject tempJsonObject;
@@ -139,7 +138,7 @@ public class MusicBrainzJSONReader {
     }
 
     private String getOrDefault(String value) {
-        return value != null ? value : na;
+        return value != null ? value : "n/a";
     }
 
     @Override
