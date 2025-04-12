@@ -1,0 +1,23 @@
+{
+  "created": "2025-04-11T00:28:16.657Z",
+  "count": 76474,
+  "offset": 0,
+  "cdstubs": [
+    {
+      "id": "hU2FJcnlVtratcrOn9rAhPzzCMo-",
+      "score": 100,
+      "count": 8,
+      "title": "Songs From The Big Chair",
+      "artist": "Tears For Fears",
+      "barcode": "042282430021"
+    },
+    {
+      "id": "KZn02eYalzdXJNbtmuz2xKDzLZU-",
+      "score": 100,
+      "count": 13,
+      "title": "+",
+      "artist": "Ed Sheeran",
+      "barcode": "825646634422"
+    }
+  ]
+}
