@@ -14,10 +14,10 @@ import com.google.gson.*;
 
 import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
 
 public class MusicBrainzJSONReader {
     private final JsonObject json;
+    private final String na = "n/a";
 
     public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
         JsonObject tempJsonObject;
@@ -33,13 +33,7 @@ public class MusicBrainzJSONReader {
     @SuppressWarnings("unchecked")
     private <T> T[] parseJsonArray(String key, JsonArrayProcessor<T> processor, T[] array) {
         if (!json.has(key)) {
-            array = (T[]) Array.newInstance(array.getClass().getComponentType(), 1);
-            try {
-                array[0] = (T) array.getClass().getComponentType().getDeclaredConstructor().newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+            array = (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
             return array;
         }
         JsonArray jsonArray = json.getAsJsonArray(key);
@@ -60,7 +54,7 @@ public class MusicBrainzJSONReader {
         return parseJsonArray("releases", jsonObject -> {
             String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
             String date = jsonHasAndIsNotNull(jsonObject, "date") ? jsonObject.get("date").getAsString() : null;
-            int trackCount = jsonHasAndIsNotNull(jsonObject, "count") ? jsonObject.get("count").getAsInt() : -1;
+            int trackCount = jsonHasAndIsNotNull(jsonObject, "track-count") ? jsonObject.get("track-count").getAsInt() : -1;
             String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
 
             JsonArray artistsArray = jsonObject.getAsJsonArray("artist-credit");
@@ -108,10 +102,10 @@ public class MusicBrainzJSONReader {
         return createTableModel(releaseArray, columnNames, item -> {
             MusicBrainzRelease release = (MusicBrainzRelease) item;
             return new String[]{
-                    release.getTitle(),
-                    release.getArtistsAsString(),
-                    String.valueOf(release.getTrackCount()),
-                    release.getDate(),
+                    getOrDefault(release.getTitle()),
+                    getOrDefault(release.getArtistsAsString()),
+                    getOrDefault(release.getTrackCount() != -1 ? String.valueOf(release.getTrackCount()) : null),
+                    getOrDefault(release.getDate()),
                     ""
             };
         });
@@ -122,9 +116,9 @@ public class MusicBrainzJSONReader {
         return createTableModel(cdStubArray, columnNames, item -> {
             MusicBrainzCDStub cdStub = (MusicBrainzCDStub) item;
             return new String[]{
-                    cdStub.getTitle(),
-                    cdStub.getArtistsAsString(),
-                    String.valueOf(cdStub.getTrackCount()),
+                    getOrDefault(cdStub.getTitle()),
+                    getOrDefault(cdStub.getArtistsAsString()),
+                    getOrDefault(String.valueOf(cdStub.getTrackCount())),
                     ""
             };
         });
@@ -142,6 +136,10 @@ public class MusicBrainzJSONReader {
 
     private boolean jsonHasAndIsNotNull(JsonObject jsonObject, String memberName) {
         return jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull();
+    }
+
+    private String getOrDefault(String value) {
+        return value != null ? value : na;
     }
 
     @Override
