@@ -22,6 +22,12 @@ public class MusicBrainzCDStub {
         this.artists = artists;
         this.trackCount = trackCount;
     }
+    public MusicBrainzCDStub() {
+        this.id = "";
+        this.title = "";
+        this.artists = new String[0];
+        this.trackCount = -1;
+    }
 
     public String getArtistsAsString() {
         StringBuilder sb = new StringBuilder();

@@ -25,6 +25,14 @@ public class MusicBrainzRelease {
         this.id = id;
     }
 
+    public MusicBrainzRelease() {
+        this.title = "";
+        this.artists = new String[0];
+        this.date = "";
+        this.trackCount = 0;
+        this.id = "";
+    }
+
     public String getArtistsAsString() {
         StringBuilder sb = new StringBuilder();
         for (String artist : artists) {
