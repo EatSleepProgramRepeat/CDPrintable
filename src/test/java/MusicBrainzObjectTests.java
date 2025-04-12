@@ -4,9 +4,6 @@ import com.CDPrintable.MusicBrainzResources.MusicBrainzRelease;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.table.DefaultTableModel;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,6 +16,7 @@ public class MusicBrainzObjectTests {
         MusicBrainzRelease[] releases = reader.getReleases();
 
         assertEquals("{}", reader.toString());
+        assertEquals("MusicBrainzRelease", releases[0].getClass().getSimpleName());
     }
 
     @Test
@@ -129,21 +127,5 @@ public class MusicBrainzObjectTests {
 
         assertNotNull(tableModel);
         assertEquals(0, tableModel.getRowCount());
-    }
-
-    private void getExampleJson() {
-        if (json != null) {return;}
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("example cdstub json.json"));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            json = sb.toString();
-            reader.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
