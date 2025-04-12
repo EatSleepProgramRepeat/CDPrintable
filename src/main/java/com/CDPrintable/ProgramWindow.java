@@ -20,11 +20,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.Objects;
 
 public class ProgramWindow {
     private final UserAgent userAgent;
     private JLabel fullUserAgentLabel = new JLabel();
 
+    /**
+     * Creates a new ProgramWindow and sets up the GUI.
+     */
     public ProgramWindow() {
         userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, "example@example.com");
 
@@ -47,6 +51,11 @@ public class ProgramWindow {
         // Set the frame to be visible
         frame.setVisible(true);
     }
+
+    /**
+     * Gets a JPanel for the table panel. This is a helper method.
+     * @return A JPanel with the table panel.
+     */
     private JPanel tablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
@@ -60,6 +69,11 @@ public class ProgramWindow {
 
         return panel;
     }
+
+    /**
+     * Gets a JPanel for the search panel. This is a helper method.
+     * @return A JPanel with the search panel.
+     */
     private JPanel searchPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -79,32 +93,37 @@ public class ProgramWindow {
         // CD Search Panel set up
         JPanel cdSearchPanel = new JPanel();
         cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
+
         JTextField searchField = new JTextField(15);
+
         JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
+
+        // Search button and event listener setup
         JButton searchButton = new JButton("Search");
-        searchButton.addActionListener(e -> {
+        searchButton.addActionListener(_ -> {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
             }
             if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
-                searchTable.setModel(getCDStubModel());
                 MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
 
-
+                // Get CDStubs and set the table model
                 MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
                 searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
             } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
-                searchTable.setModel(getArtistModel());
+                searchTable.setModel(getArtistModel());     // Default model
             } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
-                searchTable.setModel(getReleaseModel());
                 MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
 
+                // Get Releases and set the table model
                 MusicBrainzRelease[] releases = reader.getReleases();
                 searchTable.setModel(reader.getReleasesAsTableModel(releases));
             } else {
+                // how does this even happen
                 JOptionPane.showMessageDialog(panel, "Please select a search type.");
             }
         });
+
         cdSearchPanel.setLayout(new FlowLayout());
         cdSearchPanel.add(searchTypeComboBox);
         cdSearchPanel.add(searchField);
@@ -116,6 +135,12 @@ public class ProgramWindow {
         return panel;
     }
 
+    /**
+     * Sends a request to the MusicBrainz API.
+     * @param queryType The query type to send. E.g. "cdstub", "release", etc.
+     * @param query The query to send.
+     * @return a MusicBrainzJSONReader object with the response JSON already in it.
+     */
     private MusicBrainzJSONReader sendRequest(String queryType, String query) {
         MusicBrainzRequest request = new MusicBrainzRequest(queryType, query);
         WebRequest webRequest = new WebRequest(request, userAgent);
@@ -128,31 +153,47 @@ public class ProgramWindow {
                     There was a fatal error when sending the request. Please try again or submit an issue on GitHub.
                     Here are some things to try:
                     • Check your internet connection.
-                    • Remove any special characters from your query.""");
+                    • Remove any special characters from your query.""", "CDPrintable Severe Error", JOptionPane.ERROR_MESSAGE);
         }
 
-        MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-        return reader;
+        return new MusicBrainzJSONReader(Objects.requireNonNullElse(response, ""));
+
     }
 
+    /**
+     * Gets a default table model for CDStubs.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getCDStubModel() {
         String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
         String[][] data = {{"", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a default table model for Artists.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getArtistModel() {
         String[] columnNames = {"Artist Name", "Date Organised", ""};
         String[][] data = {{"", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a default table model for Releases.
+     * @return A DefaultTableModel with the correct columns.
+     */
     private DefaultTableModel getReleaseModel() {
         String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
         String[][] data = {{"", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets a JPanel for settings. This is another helper method.
+     * @return A JPanel with the settings window.
+     */
     private JPanel settingsPanel() {
         JPanel panel = new JPanel(new GridLayout(1, 2));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -163,6 +204,7 @@ public class ProgramWindow {
         JPanel userAgentPanel = new JPanel(new BorderLayout());
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
+        // Setup user agent text fields, labels, and document listeners
         JLabel userAgentLabel = new JLabel("User Agent:");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
@@ -181,11 +223,11 @@ public class ProgramWindow {
             public void changedUpdate(DocumentEvent e) {}   // Not used
         });
 
+        // Set up the user agent field with labels and document listener.
         JLabel userAgentEmailLabel = new JLabel("User Agent Email:");
         JTextField userAgentEmailField = new JTextField(15);
         userAgentEmailField.setText(userAgent.getUserAgentEmail());
         userAgentEmailField.getDocument().addDocumentListener(new DocumentListener() {
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
