@@ -18,6 +18,11 @@ import java.lang.reflect.Array;
 public class MusicBrainzJSONReader {
     private final JsonObject json;
 
+    /*
+     * Creates a MusicBrainzJSONReader from a JSON string.
+     * @param json The JSON string.
+     * @throws IllegalArgumentException If the JSON is invalid.
+     */
     public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
         JsonObject tempJsonObject;
         try {
@@ -29,33 +34,51 @@ public class MusicBrainzJSONReader {
         this.json = tempJsonObject;
     }
 
+    /**
+     * Parses a JSON array and creates a new array of the same type as the provided array.
+     *
+     * @param <T> The type of the array elements.
+     * @param key The JSON key to look for (e.g., "releases", "cdstubs").
+     * @param processor A functional interface to process each {@link JsonObject} in the JSON array
+     *                  and convert it into an object of type {@code T}.
+     * @param array An example array of type {@code T[]} used to determine the type of the output array.
+     * @return A new array of type {@code T[]} containing the processed elements from the JSON array.
+     *         If the key does not exist or the JSON array is empty, an empty array is returned.
+     */
     @SuppressWarnings("unchecked")
     private <T> T[] parseJsonArray(String key, JsonArrayProcessor<T> processor, T[] array) {
+        // Make sure the key exists in the JSON object
         if (!json.has(key)) {
+            // Return an empty array if the JSON object does not have the key
             array = (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
             return array;
         }
+        // Make a JSON array using the provided key
         JsonArray jsonArray = json.getAsJsonArray(key);
         array = (T[]) Array.newInstance(array.getClass().getComponentType(), jsonArray.size());
 
+        // Process each JSON object in the array
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-            array[i] = processor.process(jsonObject);
+            array[i] = processor.process(jsonObject);        // Uses provided processor to process the JSON object
         }
         return array;
     }
 
-    /*
+    /**
     * Gets releases from the JSON.
     * @return An array of the releases.
      */
     public MusicBrainzRelease[] getReleases() {
         return parseJsonArray("releases", jsonObject -> {
+            // Get the title, date, track count, and id from the JSON object
+            // If the value does not exist in JSON, n/a will be returned
             String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
             String date = jsonHasAndIsNotNull(jsonObject, "date") ? jsonObject.get("date").getAsString() : null;
             int trackCount = jsonHasAndIsNotNull(jsonObject, "track-count") ? jsonObject.get("track-count").getAsInt() : -1;
             String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
 
+            // Get all artists as a String[]
             JsonArray artistsArray = jsonObject.getAsJsonArray("artist-credit");
             String[] artists = new String[artistsArray.size()];
             for (int j = 0; j < artistsArray.size(); j++) {
@@ -70,32 +93,43 @@ public class MusicBrainzJSONReader {
 
     public MusicBrainzCDStub[] getCDStubs() {
         return parseJsonArray("cdstubs", jsonObject -> {
+            // Read the title, track count, and id from the JSON object
+            // Also applies n/a should the value not exist in JSON
             String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
             String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
             int trackCount = jsonHasAndIsNotNull(jsonObject, "count") ? jsonObject.get("count").getAsInt() : -1;
             String artist = jsonHasAndIsNotNull(jsonObject, "artist") ? jsonObject.get("artist").getAsString() : null;
 
+            // Keep in mind that CDStubs only have one artist
             return new MusicBrainzCDStub(id, title, new String[] {artist}, trackCount);
         }, new MusicBrainzCDStub[0]);
     }
 
-    /*
+    /**
     * Creates a table model from an array of items.
     * @param items The array of items. Usually a MusicBrainzRelease, MusicBrainzCDStub, etc.
     * @param columnNames The names of the columns.
     * @param extractor The extractor that extracts the data from the item.
      */
     private DefaultTableModel createTableModel(Object[] items, String[] columnNames, DataExtractor extractor) {
+        // Make sure that the array is not null or empty
         if (items == null || items.length == 0) {
+            // If so, return an empty table model with column names
             return new DefaultTableModel(new String[0][0], columnNames);
         }
         String[][] data = new String[items.length][columnNames.length];
+        // Use the extractor provided to extract the data from the item
         for (int i = 0; i < items.length; i++) {
             data[i] = extractor.extractData(items[i]);
         }
         return new DefaultTableModel(data, columnNames);
     }
 
+    /**
+     * Gets the releases as a table model.
+     * @param releaseArray The array of releases.
+     * @return The table model.
+     */
     public DefaultTableModel getReleasesAsTableModel(MusicBrainzRelease[] releaseArray) {
         String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
         return createTableModel(releaseArray, columnNames, item -> {
@@ -110,6 +144,11 @@ public class MusicBrainzJSONReader {
         });
     }
 
+    /**
+     * Gets the CD stubs as a table model.
+     * @param cdStubArray The array of CD stubs.
+     * @return The table model.
+     */
     public DefaultTableModel getCDStubsAsTableModel(MusicBrainzCDStub[] cdStubArray) {
         String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
         return createTableModel(cdStubArray, columnNames, item -> {
@@ -123,20 +162,24 @@ public class MusicBrainzJSONReader {
         });
     }
 
+    // Functional interfaces for extracting data from items
     @FunctionalInterface
     private interface DataExtractor {
         String[] extractData(Object item);
     }
 
+    // Functional interface for processing JSON objects
     @FunctionalInterface
     private interface JsonArrayProcessor<T> {
         T process(JsonObject jsonObject);
     }
 
+    // Helper method to check if a JSON object has a member and is not null
     private boolean jsonHasAndIsNotNull(JsonObject jsonObject, String memberName) {
         return jsonObject.has(memberName) && !jsonObject.get(memberName).isJsonNull();
     }
 
+    // Helper method to return a default value (n/a) if the value is null
     private String getOrDefault(String value) {
         return value != null ? value : "n/a";
     }
