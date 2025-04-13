@@ -14,6 +14,27 @@ public enum Gender {
     MALE,
     FEMALE,
     NON_BINARY,
-    OTHER,
-    UNKNOWN
+    UNKNOWN;
+
+    /**
+     * Converts a string to a Gender enum.
+     * @param genderString The input string.
+     * @return The corresponding Gender enum, or UNKNOWN if no match is found.
+     */
+    public static Gender fromString(String genderString) {
+        if (genderString == null) {
+            return UNKNOWN;
+        }
+        switch (genderString.toLowerCase()) {
+            case "male":
+                return MALE;
+            case "female":
+                return FEMALE;
+            case "non-binary":
+            case "nonbinary":
+                return NON_BINARY;
+            default:
+                return UNKNOWN;
+        }
+    }
 }
