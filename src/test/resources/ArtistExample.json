@@ -1,0 +1,194 @@
+{
+  "created": "2025-04-13T18:39:18.390Z",
+  "count": 25918,
+  "offset": 0,
+  "artists": [
+    {
+      "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+      "type": "Group",
+      "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+      "score": 100,
+      "name": "Tears for Fears",
+      "sort-name": "Tears for Fears",
+      "country": "GB",
+      "area": {
+        "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+        "type": "Country",
+        "type-id": "06dd0ae4-8c74-30bb-b43d-95dcedf961de",
+        "name": "United Kingdom",
+        "sort-name": "United Kingdom",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "begin-area": {
+        "id": "f51a1724-464b-41ae-b96e-30f868973077",
+        "type": "City",
+        "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+        "name": "Bath",
+        "sort-name": "Bath",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "isnis": [
+        "0000000121834678"
+      ],
+      "life-span": {
+        "begin": "1981",
+        "ended": null
+      },
+      "aliases": [
+        {
+          "sort-name": "Tears For Fear",
+          "name": "Tears For Fear",
+          "locale": null,
+          "type": null,
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        }
+      ],
+      "tags": [
+        {
+          "count": 1,
+          "name": "synthpop"
+        },
+        {
+          "count": 0,
+          "name": "british"
+        },
+        {
+          "count": 8,
+          "name": "new wave"
+        },
+        {
+          "count": 0,
+          "name": "uk"
+        },
+        {
+          "count": 1,
+          "name": "synth-pop"
+        },
+        {
+          "count": 0,
+          "name": "britpop"
+        },
+        {
+          "count": 1,
+          "name": "psychedelic pop"
+        },
+        {
+          "count": 6,
+          "name": "pop rock"
+        },
+        {
+          "count": 0,
+          "name": "english"
+        },
+        {
+          "count": 0,
+          "name": "classic pop and rock"
+        },
+        {
+          "count": 1,
+          "name": "sophisti-pop"
+        },
+        {
+          "count": 4,
+          "name": "art pop"
+        }
+      ]
+    },
+    {
+      "id": "80609a00-b394-4a49-975b-2db6b543fa97",
+      "type": "Person",
+      "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+      "score": 100,
+      "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+      "name": "The Kid LAROI",
+      "sort-name": "Kid Laroi, The",
+      "gender": "male",
+      "country": "AU",
+      "area": {
+        "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+        "type": "Country",
+        "type-id": "06dd0ae4-8c74-30bb-b43d-95dcedf961de",
+        "name": "Australia",
+        "sort-name": "Australia",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "begin-area": {
+        "id": "767a2324-3a11-4d8d-82c8-5b0cb9c5ca84",
+        "type": "District",
+        "type-id": "84039871-5e47-38ca-a66a-45e512c8290f",
+        "name": "Waterloo",
+        "sort-name": "Waterloo",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "disambiguation": "rapper/singer",
+      "life-span": {
+        "begin": "2003-08-16",
+        "ended": null
+      },
+      "aliases": [
+        {
+          "sort-name": "더 키드 라로이",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "The Kid LAROI",
+          "locale": "ko_KR",
+          "type": "Artist name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Howard, Charlton Kenneth Jeffrey",
+          "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+          "name": "Charlton Kenneth Jeffrey Howard",
+          "locale": null,
+          "type": "Legal name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Howard, Charlton",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "Charlton Howard",
+          "locale": null,
+          "type": "Artist name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        }
+      ],
+      "tags": [
+        {
+          "count": 4,
+          "name": "hip hop"
+        },
+        {
+          "count": 1,
+          "name": "pop rap"
+        },
+        {
+          "count": 2,
+          "name": "emo rap"
+        },
+        {
+          "count": 1,
+          "name": "rap"
+        },
+        {
+          "count": 1,
+          "name": "english"
+        }
+      ]
+    }
+  ]
+}
