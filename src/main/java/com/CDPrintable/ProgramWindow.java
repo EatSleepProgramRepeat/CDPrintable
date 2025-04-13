@@ -10,15 +10,13 @@
 
 package com.CDPrintable;
 
-import com.CDPrintable.MusicBrainzResources.MusicBrainzCDStub;
-import com.CDPrintable.MusicBrainzResources.MusicBrainzJSONReader;
-import com.CDPrintable.MusicBrainzResources.MusicBrainzRelease;
-import com.CDPrintable.MusicBrainzResources.MusicBrainzRequest;
+import com.CDPrintable.MusicBrainzResources.*;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.Objects;
 
@@ -111,7 +109,11 @@ public class ProgramWindow {
                 MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
                 searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
             } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
-                searchTable.setModel(getArtistModel());     // Default model
+                MusicBrainzJSONReader reader = sendRequest("artist", searchField.getText());
+
+                // Get Artists and set the table model
+                MusicBrainzArtist[] artists = reader.getArtists();
+                searchTable.setModel(reader.getArtistsAsTableModel(artists));
             } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
                 MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
 
@@ -122,6 +124,7 @@ public class ProgramWindow {
                 // how does this even happen
                 JOptionPane.showMessageDialog(panel, "Please select a search type.");
             }
+            resizeColumnWidths(searchTable);
         });
 
         cdSearchPanel.setLayout(new FlowLayout());
@@ -175,8 +178,8 @@ public class ProgramWindow {
      * @return A DefaultTableModel with the correct columns.
      */
     private DefaultTableModel getArtistModel() {
-        String[] columnNames = {"Artist Name", "Date Organised", ""};
-        String[][] data = {{"", "", ""}};
+        String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
+        String[][] data = {{"", "", "", "", "", "", "", ""}};
         return new javax.swing.table.DefaultTableModel(data, columnNames);
     }
 
@@ -288,5 +291,26 @@ public class ProgramWindow {
         panel.add(fontPanel);
 
         return panel;
+    }
+
+    /**
+     * Helper method to resize a tables columns to fit the largest element.
+     * @param table The table to resize.
+     */
+    private void resizeColumnWidths(JTable table) {
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            TableColumn tableColumn = table.getColumnModel().getColumn(column);
+            int preferredWidth = table.getTableHeader().getDefaultRenderer()
+                    .getTableCellRendererComponent(table, tableColumn.getHeaderValue(), false, false, -1, column)
+                    .getPreferredSize().width;
+
+            for (int row = 0; row < table.getRowCount(); row++) {
+                Component cellRenderer = table.getCellRenderer(row, column)
+                        .getTableCellRendererComponent(table, table.getValueAt(row, column), false, false, row, column);
+                preferredWidth = Math.max(preferredWidth, cellRenderer.getPreferredSize().width);
+            }
+
+            tableColumn.setPreferredWidth(preferredWidth + 2); // Add padding
+        }
     }
 }
