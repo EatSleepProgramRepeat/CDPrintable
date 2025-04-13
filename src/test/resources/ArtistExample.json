@@ -101,25 +101,94 @@
       ]
     },
     {
-      "id": "0145d962-9fb6-4ef6-8d98-48b6e59290da",
-      "type": "Group",
-      "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-      "score": 38,
-      "name": "Puppeteers for Fears",
-      "sort-name": "Puppeteers for Fears",
+      "id": "80609a00-b394-4a49-975b-2db6b543fa97",
+      "type": "Person",
+      "type-id": "b6e035f4-3ce9-331c-97df-83397230b0df",
+      "score": 100,
+      "gender-id": "36d3d30a-839d-3eda-8cb3-29be4384e4a9",
+      "name": "The Kid LAROI",
+      "sort-name": "Kid Laroi, The",
+      "gender": "male",
+      "country": "AU",
       "area": {
-        "id": "158ded5a-ac41-42fb-9c58-87d879daeadd",
-        "type": "City",
-        "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
-        "name": "Ashland",
-        "sort-name": "Ashland",
+        "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+        "type": "Country",
+        "type-id": "06dd0ae4-8c74-30bb-b43d-95dcedf961de",
+        "name": "Australia",
+        "sort-name": "Australia",
         "life-span": {
           "ended": null
         }
       },
+      "begin-area": {
+        "id": "767a2324-3a11-4d8d-82c8-5b0cb9c5ca84",
+        "type": "District",
+        "type-id": "84039871-5e47-38ca-a66a-45e512c8290f",
+        "name": "Waterloo",
+        "sort-name": "Waterloo",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "disambiguation": "rapper/singer",
       "life-span": {
+        "begin": "2003-08-16",
         "ended": null
-      }
+      },
+      "aliases": [
+        {
+          "sort-name": "더 키드 라로이",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "The Kid LAROI",
+          "locale": "ko_KR",
+          "type": "Artist name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Howard, Charlton Kenneth Jeffrey",
+          "type-id": "d4dcd0c0-b341-3612-a332-c0ce797b25cf",
+          "name": "Charlton Kenneth Jeffrey Howard",
+          "locale": null,
+          "type": "Legal name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        },
+        {
+          "sort-name": "Howard, Charlton",
+          "type-id": "894afba6-2816-3c24-8072-eadb66bd04bc",
+          "name": "Charlton Howard",
+          "locale": null,
+          "type": "Artist name",
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        }
+      ],
+      "tags": [
+        {
+          "count": 4,
+          "name": "hip hop"
+        },
+        {
+          "count": 1,
+          "name": "pop rap"
+        },
+        {
+          "count": 2,
+          "name": "emo rap"
+        },
+        {
+          "count": 1,
+          "name": "rap"
+        },
+        {
+          "count": 1,
+          "name": "english"
+        }
+      ]
     }
   ]
 }
