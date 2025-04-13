@@ -1,6 +1,4 @@
-import com.CDPrintable.MusicBrainzResources.MusicBrainzCDStub;
-import com.CDPrintable.MusicBrainzResources.MusicBrainzJSONReader;
-import com.CDPrintable.MusicBrainzResources.MusicBrainzRelease;
+import com.CDPrintable.MusicBrainzResources.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,6 +15,7 @@ public class MusicBrainzObjectTests {
     // Read example JSON files
     private final String releasesJson = readFile("src/test/resources/ReleaseExample.json");
     private final String cdStubsJson = readFile("src/test/resources/CDStubExample.json");
+    private final String artistsJson = readFile("src/test/resources/ArtistExample.json");
 
     /**
      * Test that the JSON reader can handle an invalid JSON string.
@@ -41,7 +40,9 @@ public class MusicBrainzObjectTests {
             "{\"invalidKey\": []}, releases",
             "{\"releases\": []}, releases",
             "{\"invalidKey\": []}, cdstubs",
-            "{\"cdstubs\": []}, cdstubs"
+            "{\"cdstubs\": []}, cdstubs",
+            "{\"invalidKey\": []}, artists",
+            "{\"artists\": []}, artists"
     })
     void testGetItemsWithInvalidJsonStructure(String jsonString, String key) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(jsonString);
@@ -65,7 +66,8 @@ public class MusicBrainzObjectTests {
     @ParameterizedTest
     @CsvSource({
             "{\"releases\": [{\"title\": null, \"date\": null, \"count\": null, \"id\": null, \"artist-credit\": []}]}, releases",
-            "{\"cdstubs\": [{\"title\": null, \"id\": null, \"count\": null, \"artist\": null}]}, cdstubs"
+            "{\"cdstubs\": [{\"title\": null, \"id\": null, \"count\": null, \"artist\": null}]}, cdstubs",
+            "{\"artists\": [{\"name\": null, \"sort-name\": null, \"country\": null, \"gender\": null, \"disambiguation\": null, \"life-span\": null}]}, artists"
     })
     void testGetItemsWithMissingOrNullFields(String jsonString, String key) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(jsonString);
@@ -108,10 +110,14 @@ public class MusicBrainzObjectTests {
             "releases, false, {}",                      // case 2
             "cdstubs, true, null",                      // case 1
             "cdstubs, false, {}",                       // case 2
+            "artists, true, null",                      // case 1
+            "artists, false, {}",                       // case 2
             "releases, false, {\"releases\": null}",    // case 3
             "cdstubs, false, {\"cdstubs\": null}",      // case 3
+            "artists, false, {\"artists\": null}",      // case 3
             "releases, false, {\"invalidKey\": []}",    // case 4
-            "cdstubs, false, {\"invalidKey\": []}"      // case 4
+            "cdstubs, false, {\"invalidKey\": []}",     // case 4
+            "artists, false, {\"invalidKey\": []}"      // case 4
     })
     void testGetTableModelWithArrayIssues(String key, boolean isNull, String readerJson) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(readerJson != null ? readerJson : "");
@@ -186,6 +192,44 @@ public class MusicBrainzObjectTests {
     }
 
     /**
+     * Test the JSON reader against the example JSON files. This is effectively
+     * normal operation for the program.
+     * This test is for Artists.
+     */
+    @SuppressWarnings("SpellCheckingInspection")
+    @Test
+    void genericGetArtistsTest() {
+        MusicBrainzJSONReader reader = new MusicBrainzJSONReader(artistsJson);
+        MusicBrainzArtist[] artists = reader.getArtists();
+
+        assertNotNull(artists);
+        assertEquals(2, artists.length);
+
+        assertEquals("Tears for Fears", artists[0].getName());
+        assertEquals("Tears for Fears", artists[0].getSortName());
+        assertEquals("1981", artists[0].getDateOrganized());
+        assertNull(artists[0].getBirthDate());
+        assertEquals("7c7f9c94-dee8-4903-892b-6cf44652e2de", artists[0].getId());
+        assertEquals(Gender.UNKNOWN, artists[0].getGender());
+        assertEquals("Group", artists[0].getType());
+        assertEquals("new wave", artists[0].getDisambiguation());
+        assertNull(artists[0].getLifeSpan());
+        assertEquals("United Kingdom", artists[0].getCountry());
+
+        assertEquals("The Kid LAROI", artists[1].getName());
+        assertEquals("Kid Laroi, The", artists[1].getSortName());
+        assertNull(artists[1].getDateOrganized());
+        assertEquals("2003-08-16", artists[1].getBirthDate());
+        assertEquals("80609a00-b394-4a49-975b-2db6b543fa97", artists[1].getId());
+        assertEquals(Gender.MALE, artists[1].getGender());
+        assertEquals("Person", artists[1].getType());
+        assertEquals("hip hop", artists[1].getDisambiguation());
+        assertNull(artists[1].getLifeSpan());
+        assertEquals("Australia", artists[1].getCountry());
+
+    }
+
+    /**
      * Tests the JSON reader again, but requests a table model and tests that instead.
      * This is effectively normal operation for the program.
      * This test is for Releases.
@@ -209,7 +253,7 @@ public class MusicBrainzObjectTests {
         assertEquals("Nights Like This", tableModel.getValueAt(1, 0));
         assertEquals("Kaylee Bell", tableModel.getValueAt(1, 1));
         assertEquals("11", tableModel.getValueAt(1, 2));
-        assertEquals("n/a", tableModel.getValueAt(1, 3));
+        assertEquals("", tableModel.getValueAt(1, 3));
         assertEquals("", tableModel.getValueAt(1, 4));
     }
 
@@ -237,6 +281,44 @@ public class MusicBrainzObjectTests {
         assertEquals("Ed Sheeran", tableModel.getValueAt(1, 1));
         assertEquals("13", tableModel.getValueAt(1, 2));
         assertEquals("", tableModel.getValueAt(1, 3));
+    }
+
+    /**
+     * Tests the JSON reader again, but requests a table model and tests that instead.
+     * This is effectively normal operation for the program.
+     * This test is for Artists.
+     */
+    @Test
+    void genericGetArtistsAsTableModelTest() {
+        MusicBrainzJSONReader reader = new MusicBrainzJSONReader(artistsJson);
+        MusicBrainzArtist[] artists = reader.getArtists();
+        DefaultTableModel tableModel = reader.getArtistsAsTableModel(artists);
+
+        assertNotNull(tableModel);
+        assertEquals(2, tableModel.getRowCount());
+        assertEquals(10, tableModel.getColumnCount());
+
+        assertEquals("Tears for Fears", tableModel.getValueAt(0, 0));
+        assertEquals("1981", tableModel.getValueAt(0, 1));
+        assertEquals("", tableModel.getValueAt(0, 2));
+        assertEquals("Tears for Fears", tableModel.getValueAt(0, 3));
+        assertEquals("unknown", tableModel.getValueAt(0, 4));
+        assertEquals("Group", tableModel.getValueAt(0, 5));
+        assertEquals("new wave", tableModel.getValueAt(0, 6));
+        assertEquals("", tableModel.getValueAt(0, 7));
+        assertEquals("United Kingdom", tableModel.getValueAt(0, 8));
+        assertEquals("", tableModel.getValueAt(0, 9));
+
+        assertEquals("The Kid LAROI", tableModel.getValueAt(1, 0));
+        assertEquals("", tableModel.getValueAt(1, 1));
+        assertEquals("2003-08-16", tableModel.getValueAt(1, 2));
+        assertEquals("Kid Laroi, The", tableModel.getValueAt(1, 3));
+        assertEquals("male", tableModel.getValueAt(1, 4));
+        assertEquals("Person", tableModel.getValueAt(1, 5));
+        assertEquals("hip hop", tableModel.getValueAt(1, 6));
+        assertEquals("", tableModel.getValueAt(1, 7));
+        assertEquals("Australia", tableModel.getValueAt(1, 8));
+        assertEquals("", tableModel.getValueAt(1, 9));
     }
 
     /**
