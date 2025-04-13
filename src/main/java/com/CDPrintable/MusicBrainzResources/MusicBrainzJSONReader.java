@@ -12,6 +12,8 @@ package com.CDPrintable.MusicBrainzResources;
 
 import com.google.gson.*;
 
+import java.util.Locale;
+
 import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.Array;
 
@@ -110,6 +112,94 @@ public class MusicBrainzJSONReader {
     }
 
     /**
+     * Gets Artists from the JSON.
+     * @return An array of the artists.
+     */
+    public MusicBrainzArtist[] getArtists() {
+        return parseJsonArray("artists", jsonObject -> {
+            String name = null;
+            if (jsonHasAndIsNotNull(jsonObject, "name")) {
+                JsonElement nameElement = jsonObject.get("name");
+                if (nameElement != null && !nameElement.isJsonNull()) {
+                    name = nameElement.getAsString();
+                }
+            }
+            String type = jsonHasAndIsNotNull(jsonObject, "type") ? jsonObject.get("type").getAsString() : null;
+
+            // THE CODE BELOW MAY CAUSE FUTURE BUGS, THOUGH UNLIKELY.
+            // Keep in mind that the life-span.begin JSON for artists is
+            // either the date organized or the birthdate, depending on if
+            // the artist is a group or a person.
+            String birthDate;
+            String organizedDate;
+            if (jsonHasAndIsNotNull(jsonObject, "life-span")) {
+                JsonObject lifeSpanObject = jsonObject.getAsJsonObject("life-span");
+                if("Group".equals(type)) {
+                    organizedDate = jsonHasAndIsNotNull(lifeSpanObject, "begin") ? lifeSpanObject.get("begin").getAsString() : null;
+                    birthDate = null;
+                } else if ("Person".equals(type)) {
+                    birthDate = jsonHasAndIsNotNull(lifeSpanObject, "begin") ? lifeSpanObject.get("begin").getAsString() : null;
+                    organizedDate = null;
+                } else {
+                    birthDate = null;
+                    organizedDate = null;
+                }
+            } else {
+                birthDate = null;
+                organizedDate = null;
+            }
+
+            String id = jsonHasAndIsNotNull(jsonObject, "id") ? jsonObject.get("id").getAsString() : null;
+            String sortName = jsonHasAndIsNotNull(jsonObject, "sort-name") ? jsonObject.get("sort-name").getAsString() : null;
+            // Groups do not have genders in this API.
+            Gender gender = Gender.fromString(jsonHasAndIsNotNull(jsonObject, "gender") ? jsonObject.get("gender").getAsString() : null);
+
+            String disambiguation;
+            // The code below MAY also be problematic, although VERY unlikely.
+            if (jsonHasAndIsNotNull(jsonObject, "tags")) {
+                JsonArray tagsArray = jsonObject.getAsJsonArray("tags");
+                if (!tagsArray.isEmpty()) {
+                    JsonObject firstTagObject = tagsArray.get(0).getAsJsonObject();
+                    disambiguation = jsonHasAndIsNotNull(firstTagObject, "name") ? firstTagObject.get("name").getAsString() : null;
+                    int highestCount = 0;
+                    for (JsonElement tagElement : tagsArray) {
+                        JsonObject tagObject = tagElement.getAsJsonObject();
+                        int count = jsonHasAndIsNotNull(tagObject, "count") ? tagObject.get("count").getAsInt() : -1;
+                        if (count > highestCount) {
+                            highestCount = count;
+                            disambiguation = jsonHasAndIsNotNull(tagObject, "name") ? tagObject.get("name").getAsString() : null;
+                        }
+                    }
+                } else {
+                    disambiguation = null;
+                }
+            } else {
+                disambiguation = null;
+            }
+
+            String lifeSpan;
+            if (jsonHasAndIsNotNull(jsonObject, "life-span")) {
+                JsonObject lifeSpanObject = jsonObject.getAsJsonObject("life-span");
+                if (jsonHasAndIsNotNull(lifeSpanObject, "begin") && jsonHasAndIsNotNull(lifeSpanObject, "end")) {
+                    lifeSpan = lifeSpanObject.get("begin").getAsString() + " - " + lifeSpanObject.get("end").getAsString();
+                } else {
+                    lifeSpan = null;
+                }
+            } else {
+                lifeSpan = null;
+            }
+
+            String country = jsonHasAndIsNotNull(jsonObject, "country") ? jsonObject.get("country").getAsString() : null;
+            if (country != null) {
+                Locale locale = new Locale.Builder().setRegion(country).build();
+                country = locale.getDisplayCountry();
+            }
+
+            return new MusicBrainzArtist(name, organizedDate, birthDate, id, sortName, gender, type, disambiguation, lifeSpan, country);
+        }, new MusicBrainzArtist[0]);
+    }
+
+    /**
     * Creates a table model from an array of items.
     * @param items The array of items. Usually a MusicBrainzRelease, MusicBrainzCDStub, etc.
     * @param columnNames The names of the columns.
@@ -167,6 +257,30 @@ public class MusicBrainzJSONReader {
     }
 
     /**
+     * Gets the artists as a table model.
+     * @param artistArray The array of artists.
+     * @return The table model.
+     */
+    public DefaultTableModel getArtistsAsTableModel(MusicBrainzArtist[] artistArray) {
+        String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
+        return createTableModel(artistArray, columnNames, item -> {
+           MusicBrainzArtist artist = (MusicBrainzArtist) item;
+           return new String[] {
+                   getOrDefault(artist.getName()),
+                   getOrDefault(artist.getDateOrganized()),
+                   getOrDefault(artist.getBirthDate()),
+                   getOrDefault(artist.getSortName()),
+                   getOrDefault(artist.getGender().toString().toLowerCase(Locale.ROOT)),
+                   getOrDefault(artist.getType()),
+                   getOrDefault(artist.getDisambiguation()),
+                   getOrDefault(artist.getLifeSpan()),
+                   getOrDefault(artist.getCountry()),
+                   ""
+           };
+        });
+    }
+
+    /**
      * Functional interface for extracting data from an item.
      */
     @FunctionalInterface
@@ -199,7 +313,7 @@ public class MusicBrainzJSONReader {
      * @return The value or "n/a" if the value is null.
      */
     private String getOrDefault(String value) {
-        return value != null ? value : "n/a";
+        return value != null ? value : "";
     }
 
     @Override
