@@ -25,16 +25,11 @@ public enum Gender {
         if (genderString == null) {
             return UNKNOWN;
         }
-        switch (genderString.toLowerCase()) {
-            case "male":
-                return MALE;
-            case "female":
-                return FEMALE;
-            case "non-binary":
-            case "nonbinary":
-                return NON_BINARY;
-            default:
-                return UNKNOWN;
-        }
+        return switch (genderString.toLowerCase()) {
+            case "male" -> MALE;
+            case "female" -> FEMALE;
+            case "non-binary", "nonbinary" -> NON_BINARY;
+            default -> UNKNOWN;
+        };
     }
 }
