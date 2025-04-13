@@ -70,7 +70,9 @@ public class MusicBrainzRequest {
             url.append(otherParams);
         }
 
-        return url.toString().replace(" ", "%20");
+        return url.toString()
+                .replace(" ", "%20")
+                .replace("\"", "%22");
     }
 
     /**
