@@ -1,0 +1,125 @@
+{
+  "created": "2025-04-13T18:39:18.390Z",
+  "count": 25918,
+  "offset": 0,
+  "artists": [
+    {
+      "id": "7c7f9c94-dee8-4903-892b-6cf44652e2de",
+      "type": "Group",
+      "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+      "score": 100,
+      "name": "Tears for Fears",
+      "sort-name": "Tears for Fears",
+      "country": "GB",
+      "area": {
+        "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+        "type": "Country",
+        "type-id": "06dd0ae4-8c74-30bb-b43d-95dcedf961de",
+        "name": "United Kingdom",
+        "sort-name": "United Kingdom",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "begin-area": {
+        "id": "f51a1724-464b-41ae-b96e-30f868973077",
+        "type": "City",
+        "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+        "name": "Bath",
+        "sort-name": "Bath",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "isnis": [
+        "0000000121834678"
+      ],
+      "life-span": {
+        "begin": "1981",
+        "ended": null
+      },
+      "aliases": [
+        {
+          "sort-name": "Tears For Fear",
+          "name": "Tears For Fear",
+          "locale": null,
+          "type": null,
+          "primary": null,
+          "begin-date": null,
+          "end-date": null
+        }
+      ],
+      "tags": [
+        {
+          "count": 1,
+          "name": "synthpop"
+        },
+        {
+          "count": 0,
+          "name": "british"
+        },
+        {
+          "count": 8,
+          "name": "new wave"
+        },
+        {
+          "count": 0,
+          "name": "uk"
+        },
+        {
+          "count": 1,
+          "name": "synth-pop"
+        },
+        {
+          "count": 0,
+          "name": "britpop"
+        },
+        {
+          "count": 1,
+          "name": "psychedelic pop"
+        },
+        {
+          "count": 6,
+          "name": "pop rock"
+        },
+        {
+          "count": 0,
+          "name": "english"
+        },
+        {
+          "count": 0,
+          "name": "classic pop and rock"
+        },
+        {
+          "count": 1,
+          "name": "sophisti-pop"
+        },
+        {
+          "count": 4,
+          "name": "art pop"
+        }
+      ]
+    },
+    {
+      "id": "0145d962-9fb6-4ef6-8d98-48b6e59290da",
+      "type": "Group",
+      "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+      "score": 38,
+      "name": "Puppeteers for Fears",
+      "sort-name": "Puppeteers for Fears",
+      "area": {
+        "id": "158ded5a-ac41-42fb-9c58-87d879daeadd",
+        "type": "City",
+        "type-id": "6fd8f29a-3d0a-32fc-980d-ea697b69da78",
+        "name": "Ashland",
+        "sort-name": "Ashland",
+        "life-span": {
+          "ended": null
+        }
+      },
+      "life-span": {
+        "ended": null
+      }
+    }
+  ]
+}
