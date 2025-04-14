@@ -8,13 +8,21 @@
  * This is the main build file.
  */
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val versionProperties = Properties()
+file("src/main/resources/version.properties").takeIf { it.exists() }?.let {
+    versionProperties.load(FileInputStream(it))
+}
+
 plugins {
     id("java")
     id("application")
 }
 
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = versionProperties.getProperty("version", "0.0-VERSION-ERROR")
 
 repositories {
     mavenCentral()
@@ -34,4 +42,18 @@ tasks.test {
 application {
     mainClass.set("com.CDPrintable.Main")
     applicationDefaultJvmArgs = listOf("-Djava.library.path=build/libs")
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(22))
+    }
+}
+
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes(
+            "Main-Class" to "com.CDPrintable.Main"
+        )
+    }
 }
