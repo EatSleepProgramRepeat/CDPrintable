@@ -23,6 +23,8 @@ import java.util.Objects;
 public class ProgramWindow {
     private final UserAgent userAgent;
     private JLabel fullUserAgentLabel = new JLabel();
+    private final JPanel cdSearchPanel = new JPanel();
+    private final JLabel searchStatusLabel = new JLabel("Status: Nothing's going on.");
 
     /**
      * Creates a new ProgramWindow and sets up the GUI.
@@ -76,20 +78,20 @@ public class ProgramWindow {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        // Track List panel set up
+        // Track List panel set-up
         JPanel trackListPanel = new JPanel(new BorderLayout());
         trackListPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
 
         // Search table set up
         JTable searchTable = new JTable(getCDStubModel());
         JScrollPane trackListScrollPane = new JScrollPane(searchTable);
+        trackListPanel.add(searchStatusLabel, BorderLayout.NORTH);
         trackListPanel.add(trackListScrollPane, BorderLayout.CENTER);
 
         // Add the Track List panel to the main panel
         panel.add(trackListPanel, BorderLayout.CENTER);
 
         // CD Search Panel set up
-        JPanel cdSearchPanel = new JPanel();
         cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
 
         JTextField searchField = new JTextField(15);
@@ -102,26 +104,36 @@ public class ProgramWindow {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
             }
+            setSearchStatus("Preforming search...", "blue");
             if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
-                MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
+                Constants.THREAD_MANAGER.submit(() -> {
+                    MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
 
-                // Get CDStubs and set the table model
-                MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
-                searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
+                    // Get CDStubs and set the table model
+                    MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                    searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
+                    setSearchStatus("All done!", "green");
+                });
             } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
-                MusicBrainzJSONReader reader = sendRequest("artist", searchField.getText());
+                Constants.THREAD_MANAGER.submit(() -> {
+                    MusicBrainzJSONReader reader = sendRequest("artist", searchField.getText());
 
-                // Get Artists and set the table model
-                MusicBrainzArtist[] artists = reader.getArtists();
-                searchTable.setModel(reader.getArtistsAsTableModel(artists));
+                    // Get Artists and set the table model
+                    MusicBrainzArtist[] artists = reader.getArtists();
+                    searchTable.setModel(reader.getArtistsAsTableModel(artists));
+                    setSearchStatus("All done!", "green");
+                });
             } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
-                MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
+                Constants.THREAD_MANAGER.submit(() -> {
+                    MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
 
-                // Get Releases and set the table model
-                MusicBrainzRelease[] releases = reader.getReleases();
-                searchTable.setModel(reader.getReleasesAsTableModel(releases));
+                    // Get Releases and set the table model
+                    MusicBrainzRelease[] releases = reader.getReleases();
+                    searchTable.setModel(reader.getReleasesAsTableModel(releases));
+                    setSearchStatus("All done!", "green");
+                });
             } else {
-                // how does this even happen
+                // how does this even happen?
                 JOptionPane.showMessageDialog(panel, "Please select a search type.");
             }
             resizeColumnWidths(searchTable);
@@ -286,7 +298,7 @@ public class ProgramWindow {
         userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
         userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
 
-        // Add sub panels to main panel
+        // Add subpanels to the main panel
         panel.add(userAgentPanel);
         panel.add(fontPanel);
 
@@ -294,7 +306,7 @@ public class ProgramWindow {
     }
 
     /**
-     * Helper method to resize a tables columns to fit the largest element.
+     * Helper method to resize a table column to fit the largest element.
      * @param table The table to resize.
      */
     private void resizeColumnWidths(JTable table) {
@@ -312,5 +324,9 @@ public class ProgramWindow {
 
             tableColumn.setPreferredWidth(preferredWidth + 2); // Add padding
         }
+    }
+
+    public void setSearchStatus(String status, String color) {
+        searchStatusLabel.setText("<html><font color='" + color + "'>Status: " + status + "</font></html>");
     }
 }

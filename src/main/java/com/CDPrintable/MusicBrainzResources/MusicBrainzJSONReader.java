@@ -10,12 +10,17 @@
 
 package com.CDPrintable.MusicBrainzResources;
 
+import com.CDPrintable.Constants;
 import com.google.gson.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.lang.reflect.Array;
+import java.util.concurrent.Future;
 
 public class MusicBrainzJSONReader {
     private final JsonObject json;
@@ -37,6 +42,28 @@ public class MusicBrainzJSONReader {
     }
 
     /**
+     * This method splits a JSON array into smaller chunks for multithreading.
+     * @param jsonArray The JSON array to split.
+     */
+    public JsonArray[] splitJsonArray(JsonArray jsonArray) {
+        int chunkSize = Constants.MAX_THREADS;
+        int arraySize = jsonArray.size();
+        int numChunks = (int) Math.ceil((double) arraySize / chunkSize);
+        JsonArray[] chunks = new JsonArray[numChunks];
+
+        for (int i = 0; i < numChunks; i++) {
+            int start = i * chunkSize;
+            int end = Math.min(start + chunkSize, arraySize);
+            JsonArray chunk = new JsonArray();
+            for (int j = start; j < end; j++) {
+                chunk.add(jsonArray.get(j));
+            }
+            chunks[i] = chunk;
+        }
+        return chunks;
+    }
+
+    /**
      * Parses a JSON array and creates a new array of the same type as the provided array.
      *
      * @param <T> The type of the array elements.
@@ -49,22 +76,40 @@ public class MusicBrainzJSONReader {
      */
     @SuppressWarnings("unchecked")
     private <T> T[] parseJsonArray(String key, JsonArrayProcessor<T> processor, T[] array) {
-        // Make sure the key exists in the JSON object
-        if (!json.has(key)) {
-            // Return an empty array if the JSON object does not have the key
-            array = (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
-            return array;
+        if(!json.has(key)) {
+            // Return an empty array if the key does not exist
+            return (T[]) Array.newInstance(array.getClass().getComponentType(), 0);
         }
-        // Make a JSON array using the provided key
-        JsonArray jsonArray = json.getAsJsonArray(key);
-        array = (T[]) Array.newInstance(array.getClass().getComponentType(), jsonArray.size());
 
-        // Process each JSON object in the array
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JsonObject jsonObject = jsonArray.get(i).getAsJsonObject();
-            array[i] = processor.process(jsonObject);        // Uses provided processor to process the JSON object
+        JsonArray jsonArray = json.getAsJsonArray(key);
+        JsonArray[] chunks = splitJsonArray(jsonArray);
+
+        // Use multithreading to process the JSON array
+        // This is a list of promises that promise to return a list
+        // of whatever type T is, e.g., MusicBrainzRelease.
+        List<Future<List<T>>> futures = new ArrayList<>();
+        for (JsonArray chunk : chunks) {
+            // Submit a task to the thread manager
+            futures.add(Constants.THREAD_MANAGER.submit(() -> {
+                List<T> result = new ArrayList<>();
+                for (JsonElement element : chunk) {
+                    JsonObject jsonObject = element.getAsJsonObject();
+                    result.add(processor.process(jsonObject));
+                }
+                return result;
+            }));
         }
-        return array;
+
+        List<T> resultList = new ArrayList<>();
+        try {
+            for (Future<List<T>> future : futures) {
+                resultList.addAll(future.get());
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return resultList.toArray((T[]) Array.newInstance(array.getClass().getComponentType(), resultList.size()));
     }
 
     /**
