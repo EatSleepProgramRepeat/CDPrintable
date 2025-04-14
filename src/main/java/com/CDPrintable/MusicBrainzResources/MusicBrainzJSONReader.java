@@ -235,10 +235,6 @@ public class MusicBrainzJSONReader {
             }
 
             String country = jsonHasAndIsNotNull(jsonObject, "country") ? jsonObject.get("country").getAsString() : null;
-            if (country != null) {
-                Locale locale = new Locale.Builder().setRegion(country).build();
-                country = locale.getDisplayCountry();
-            }
 
             return new MusicBrainzArtist(name, organizedDate, birthDate, id, sortName, gender, type, disambiguation, lifeSpan, country);
         }, new MusicBrainzArtist[0]);
