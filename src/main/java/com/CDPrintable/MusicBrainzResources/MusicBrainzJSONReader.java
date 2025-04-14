@@ -11,6 +11,7 @@
 package com.CDPrintable.MusicBrainzResources;
 
 import com.CDPrintable.Constants;
+import com.CDPrintable.ProgramWindow;
 import com.google.gson.*;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class MusicBrainzJSONReader {
 
     /*
      * Creates a MusicBrainzJSONReader from a JSON string.
-     * @param json The JSON string.
+     * @param JSON The JSON string.
      * @throws IllegalArgumentException If the JSON is invalid.
      */
     public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
@@ -269,6 +270,7 @@ public class MusicBrainzJSONReader {
         String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
         return createTableModel(releaseArray, columnNames, item -> {
             MusicBrainzRelease release = (MusicBrainzRelease) item;
+            ProgramWindow.addId(getOrDefault(release.getId()));
             return new String[]{
                     getOrDefault(release.getTitle()),
                     getOrDefault(release.getArtistsAsString()),
@@ -288,6 +290,7 @@ public class MusicBrainzJSONReader {
         String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
         return createTableModel(cdStubArray, columnNames, item -> {
             MusicBrainzCDStub cdStub = (MusicBrainzCDStub) item;
+            ProgramWindow.addId(getOrDefault(cdStub.getId()));
             return new String[]{
                     getOrDefault(cdStub.getTitle()),
                     getOrDefault(cdStub.getArtistsAsString()),
@@ -306,6 +309,7 @@ public class MusicBrainzJSONReader {
         String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
         return createTableModel(artistArray, columnNames, item -> {
            MusicBrainzArtist artist = (MusicBrainzArtist) item;
+           ProgramWindow.addId(getOrDefault(artist.getId()));
            return new String[] {
                    getOrDefault(artist.getName()),
                    getOrDefault(artist.getDateOrganized()),

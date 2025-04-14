@@ -18,6 +18,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 public class ProgramWindow {
@@ -25,6 +29,7 @@ public class ProgramWindow {
     private JLabel fullUserAgentLabel = new JLabel();
     private final JPanel cdSearchPanel = new JPanel();
     private final JLabel searchStatusLabel = new JLabel("Status: Nothing's going on.");
+    private static final ArrayList<String> idList = new ArrayList<>();
 
     /**
      * Creates a new ProgramWindow and sets up the GUI.
@@ -83,7 +88,17 @@ public class ProgramWindow {
         trackListPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
 
         // Search table set up
-        JTable searchTable = new JTable(getCDStubModel());
+        JTable searchTable = new JTable(getTableModel("CDStub"));
+        searchTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = searchTable.rowAtPoint(e.getPoint());
+                int column = searchTable.columnAtPoint(e.getPoint());
+                if (row != -1 && column != -1) {
+                    clickSearch(row, column, searchTable);
+                }
+            }
+        });
         JScrollPane trackListScrollPane = new JScrollPane(searchTable);
         trackListPanel.add(searchStatusLabel, BorderLayout.NORTH);
         trackListPanel.add(trackListScrollPane, BorderLayout.CENTER);
@@ -104,37 +119,45 @@ public class ProgramWindow {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
             }
-            setSearchStatus("Preforming search...", "blue");
-            if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
 
+            String selectedItem = searchTypeComboBox.getSelectedItem().toString();
+            if (selectedItem != null) {
+                searchTable.setModel(getTableModel(selectedItem));
+            } else {
+                selectedItem = "";
+            }
+
+            setSearchStatus("Preforming search...", "blue");
+            MusicBrainzJSONReader reader = sendRequest(selectedItem.toLowerCase(Locale.ROOT), searchField.getText());
+            switch (selectedItem) {
+                case "CDStub" -> Constants.THREAD_MANAGER.submit(() -> {
                     // Get CDStubs and set the table model
                     MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                    for (MusicBrainzCDStub cdStub : cdStubs) {
+                        addId(cdStub.getId());
+                    }
                     searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
                     setSearchStatus("All done!", "green");
                 });
-            } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("artist", searchField.getText());
-
+                case "Artist" -> Constants.THREAD_MANAGER.submit(() -> {
                     // Get Artists and set the table model
                     MusicBrainzArtist[] artists = reader.getArtists();
+                    for (MusicBrainzArtist artist : artists) {
+                        addId(artist.getId());
+                    }
                     searchTable.setModel(reader.getArtistsAsTableModel(artists));
                     setSearchStatus("All done!", "green");
                 });
-            } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
-
+                case "Release" -> Constants.THREAD_MANAGER.submit(() -> {
                     // Get Releases and set the table model
                     MusicBrainzRelease[] releases = reader.getReleases();
+                    for (MusicBrainzRelease release : releases) {
+                        addId(release.getId());
+                    }
                     searchTable.setModel(reader.getReleasesAsTableModel(releases));
                     setSearchStatus("All done!", "green");
                 });
-            } else {
-                // how does this even happen?
-                JOptionPane.showMessageDialog(panel, "Please select a search type.");
+                default -> JOptionPane.showMessageDialog(panel, "Please select a search type.");
             }
             resizeColumnWidths(searchTable);
         });
@@ -176,33 +199,30 @@ public class ProgramWindow {
     }
 
     /**
-     * Gets a default table model for CDStubs.
-     * @return A DefaultTableModel with the correct columns.
+     * Helper method to get a table model
+     * @param model The model to get.
      */
-    private DefaultTableModel getCDStubModel() {
-        String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
-        String[][] data = {{"", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
-    }
-
-    /**
-     * Gets a default table model for Artists.
-     * @return A DefaultTableModel with the correct columns.
-     */
-    private DefaultTableModel getArtistModel() {
-        String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
-        String[][] data = {{"", "", "", "", "", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
-    }
-
-    /**
-     * Gets a default table model for Releases.
-     * @return A DefaultTableModel with the correct columns.
-     */
-    private DefaultTableModel getReleaseModel() {
-        String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
-        String[][] data = {{"", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
+    private DefaultTableModel getTableModel(String model) {
+        switch (model) {
+            case "CDStub" -> {
+                String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
+                String[][] data = {{"", "", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            case "Artist" -> {
+                String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
+                String[][] data = {{"", "", "", "", "", "", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            case "Release" -> {
+                String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
+                String[][] data = {{"", "", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            default -> {
+                return new DefaultTableModel(new String [][] {{}}, new String[] {});
+            }
+        }
     }
 
     /**
@@ -326,7 +346,36 @@ public class ProgramWindow {
         }
     }
 
+    /**
+     * Sets the search status label.
+     * @param status The status to set.
+     * @param color The color to set.
+     */
     public void setSearchStatus(String status, String color) {
         searchStatusLabel.setText("<html><font color='" + color + "'>Status: " + status + "</font></html>");
+    }
+
+    /**
+     * Adds an ID to the list of IDs.
+     * @param id The ID to add.
+     */
+    public static void addId(String id) {
+        idList.add(id);
+    }
+
+    /**
+     * Clears the list of IDs.
+     */
+    public static void clearIdList() {
+        idList.clear();
+    }
+
+    /**
+     * Helper method to search specific data (Artists, Releases, etc.) in the search table.
+     * @param row The row where the object is located.
+     * @param col The column where the object is located.
+     */
+    private void clickSearch(int row, int col, JTable table) {
+
     }
 }

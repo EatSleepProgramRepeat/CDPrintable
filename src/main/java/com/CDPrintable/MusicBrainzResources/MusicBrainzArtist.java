@@ -12,7 +12,7 @@ package com.CDPrintable.MusicBrainzResources;
 
 import java.util.Locale;
 
-public class MusicBrainzArtist {
+public class MusicBrainzArtist extends MusicBrainzDataObject {
     private String name;
     private String dateOrganized;   // May only be present for groups
     private String birthDate;       // May only be present for people
