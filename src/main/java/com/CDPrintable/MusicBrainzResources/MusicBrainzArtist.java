@@ -10,6 +10,8 @@
 
 package com.CDPrintable.MusicBrainzResources;
 
+import java.util.Locale;
+
 public class MusicBrainzArtist {
     private String name;
     private String dateOrganized;   // May only be present for groups
@@ -121,7 +123,9 @@ public class MusicBrainzArtist {
     }
 
     public String getCountry() {
-        return country;
+        if (country == null || country.equals("xw")) {return null;}
+        Locale locale = new Locale.Builder().setRegion(country).build();
+        return locale.getDisplayName();
     }
 
     public void setCountry(String country) {
