@@ -19,6 +19,8 @@ file("src/main/resources/version.properties").takeIf { it.exists() }?.let {
 plugins {
     id("java")
     id("application")
+    application
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "org.example"
@@ -56,4 +58,9 @@ tasks.named<Jar>("jar") {
             "Main-Class" to "com.CDPrintable.Main"
         )
     }
+}
+
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    archiveClassifier.set("all")
+    mergeServiceFiles()
 }
