@@ -51,9 +51,13 @@ public class WebRequest {
      */
     public String sendRequest() throws IOException, URISyntaxException {
         HttpURLConnection connection = (HttpURLConnection) new URI(url).toURL().openConnection();
+
         connection.setRequestMethod("GET");
         connection.setRequestProperty("User-Agent", userAgent);
         connection.setRequestProperty("Accept", "application/json");
+
+        connection.setConnectTimeout(6000);
+        connection.setReadTimeout(5000);
 
         int responseCode = connection.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
