@@ -105,7 +105,7 @@ public class MusicBrainzJSONReader {
                 resultList.addAll(future.get());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         return resultList.toArray((T[]) Array.newInstance(array.getClass().getComponentType(), resultList.size()));
