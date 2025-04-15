@@ -414,12 +414,10 @@ public class ProgramWindow {
     private String getDiscTrackListResponseString(int row) {
         MusicBrainzRequest request = new MusicBrainzRequest("tracks", idList.get(row));
         WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
-        String response = null;
+        String response;
         try {
             response = webRequest.sendRequest();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
         return response;
@@ -428,12 +426,10 @@ public class ProgramWindow {
     private String getReleaseTrackListResponseString(int row) {
         MusicBrainzRequest request = new MusicBrainzRequest("release", idList.get(row));
         WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
-        String response = null;
+        String response;
         try {
             response = webRequest.sendRequest();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }
         return response;

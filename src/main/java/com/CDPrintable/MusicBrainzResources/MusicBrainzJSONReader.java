@@ -383,10 +383,6 @@ public class MusicBrainzJSONReader {
     }
 
     /**
-     * Turns tracks from a release into a table model.
-     */
-
-    /**
      * Functional interface for extracting data from an item.
      */
     @FunctionalInterface
