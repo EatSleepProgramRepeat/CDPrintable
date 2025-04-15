@@ -41,11 +41,7 @@ public class MusicBrainzRequest {
         this.otherParams = otherParams;
     }
 
-    /**
-     * Builds the request URL for the Musicbrainz API.
-     * @return The request URL.
-     */
-    public String buildRequestURL() {
+    private StringBuilder startRequestBuild() {
         StringBuilder url = new StringBuilder("https://musicbrainz.org/ws/2/");
 
         switch (queryType) {
@@ -64,15 +60,49 @@ public class MusicBrainzRequest {
             default:
                 throw new IllegalArgumentException("Invalid query type: " + queryType);
         }
-        url.append("?query=").append(query);
-        url.append("&fmt=json");
+
+        return url;
+    }
+
+    private String endRequestBuild(StringBuilder url) {
+        if (!url.toString().contains("?")) {
+            url.append("?fmt=json");
+        } else {
+            url.append("&fmt=json");
+        }
+
         if (otherParams != null) {
             url.append(otherParams);
         }
 
-        return url.toString()
-                .replace(" ", "%20")
+        return replaceAllIllegalChars(url.toString());
+    }
+
+    private String replaceAllIllegalChars(String str) {
+        return str.replace(" ", "%20")
                 .replace("\"", "%22");
+    }
+
+    /**
+     * Builds the request URL for the Musicbrainz API.
+     * @return The request URL.
+     */
+    public String buildRequestURL() {
+        StringBuilder url = startRequestBuild();
+        url.append("?query=").append(query);
+
+        return endRequestBuild(url);
+    }
+
+    /**
+     * Builds the request URL for the Musicbrainz API to get a track list.
+     * @return The request URL.
+     */
+    public String buildTrackListURL() {
+        StringBuilder url = startRequestBuild();
+        url.append("/").append(query).append("?inc=recordings");
+
+        return endRequestBuild(url);
     }
 
     /**
