@@ -242,19 +242,17 @@ public class MusicBrainzObjectTests {
 
         assertNotNull(tableModel);
         assertEquals(2, tableModel.getRowCount());
-        assertEquals(5, tableModel.getColumnCount());
+        assertEquals(4, tableModel.getColumnCount());
 
         assertEquals("Nights Like This", tableModel.getValueAt(0, 0));
         assertEquals("Witt Lowry", tableModel.getValueAt(0, 1));
         assertEquals("1", tableModel.getValueAt(0, 2));
         assertEquals("2022-10-28", tableModel.getValueAt(0, 3));
-        assertEquals("", tableModel.getValueAt(0, 4));
 
         assertEquals("Nights Like This", tableModel.getValueAt(1, 0));
         assertEquals("Kaylee Bell", tableModel.getValueAt(1, 1));
         assertEquals("11", tableModel.getValueAt(1, 2));
         assertEquals("", tableModel.getValueAt(1, 3));
-        assertEquals("", tableModel.getValueAt(1, 4));
     }
 
     /**
@@ -270,17 +268,15 @@ public class MusicBrainzObjectTests {
 
         assertNotNull(tableModel);
         assertEquals(2, tableModel.getRowCount());
-        assertEquals(4, tableModel.getColumnCount());
+        assertEquals(3, tableModel.getColumnCount());
 
         assertEquals("Songs From The Big Chair", tableModel.getValueAt(0, 0));
         assertEquals("Tears For Fears", tableModel.getValueAt(0, 1));
         assertEquals("8", tableModel.getValueAt(0, 2));
-        assertEquals("", tableModel.getValueAt(0, 3));
 
         assertEquals("+", tableModel.getValueAt(1, 0));
         assertEquals("Ed Sheeran", tableModel.getValueAt(1, 1));
         assertEquals("13", tableModel.getValueAt(1, 2));
-        assertEquals("", tableModel.getValueAt(1, 3));
     }
 
     /**
@@ -296,7 +292,7 @@ public class MusicBrainzObjectTests {
 
         assertNotNull(tableModel);
         assertEquals(2, tableModel.getRowCount());
-        assertEquals(10, tableModel.getColumnCount());
+        assertEquals(9, tableModel.getColumnCount());
 
         assertEquals("Tears for Fears", tableModel.getValueAt(0, 0));
         assertEquals("1981", tableModel.getValueAt(0, 1));
@@ -307,7 +303,6 @@ public class MusicBrainzObjectTests {
         assertEquals("new wave", tableModel.getValueAt(0, 6));
         assertEquals("", tableModel.getValueAt(0, 7));
         assertEquals("United Kingdom", tableModel.getValueAt(0, 8));
-        assertEquals("", tableModel.getValueAt(0, 9));
 
         assertEquals("The Kid LAROI", tableModel.getValueAt(1, 0));
         assertEquals("", tableModel.getValueAt(1, 1));
@@ -318,7 +313,6 @@ public class MusicBrainzObjectTests {
         assertEquals("hip hop", tableModel.getValueAt(1, 6));
         assertEquals("", tableModel.getValueAt(1, 7));
         assertEquals("Australia", tableModel.getValueAt(1, 8));
-        assertEquals("", tableModel.getValueAt(1, 9));
     }
 
     /**
