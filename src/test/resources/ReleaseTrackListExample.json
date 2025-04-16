@@ -1,0 +1,353 @@
+{
+  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+  "id": "adb7389e-d1ee-4c66-abec-28e2670619a3",
+  "text-representation": {
+    "script": null,
+    "language": "eng"
+  },
+  "title": "THE FIRST TIME",
+  "packaging": "Box",
+  "date": "2023-12-05",
+  "quality": "normal",
+  "asin": null,
+  "barcode": "196588049521",
+  "cover-art-archive": {
+    "count": 3,
+    "artwork": true,
+    "darkened": false,
+    "back": true,
+    "front": true
+  },
+  "disambiguation": "Box Set CD",
+  "packaging-id": "c1668fc7-8944-4a00-bc3e-46e8d861d211",
+  "status": "Official",
+  "country": "US",
+  "release-events": [
+    {
+      "area": {
+        "name": "United States",
+        "iso-3166-1-codes": [
+          "US"
+        ],
+        "disambiguation": "",
+        "type-id": null,
+        "id": "489ce91b-6658-3307-9877-795b68554c98",
+        "type": null,
+        "sort-name": "United States"
+      },
+      "date": "2023-12-05"
+    }
+  ],
+  "media": [
+    {
+      "format": "CD",
+      "track-offset": 0,
+      "format-id": "9712d52a-4509-3d4b-a1a2-67c88c643e31",
+      "title": "",
+      "track-count": 20,
+      "tracks": [
+        {
+          "title": "SORRY",
+          "position": 1,
+          "id": "8809748b-092e-4bd2-9a1c-ca10ee1e2768",
+          "length": 192000,
+          "number": "1",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-10",
+            "video": false,
+            "title": "SORRY",
+            "id": "4d1cc7fc-3439-4a54-b703-2075c7da205b",
+            "length": 192000
+          }
+        },
+        {
+          "recording": {
+            "video": false,
+            "title": "BLEED",
+            "id": "17e8a0a7-9643-41ad-8097-9581c9b1a5c9",
+            "length": 169000,
+            "disambiguation": "",
+            "first-release-date": "2023-11-10"
+          },
+          "number": "2",
+          "position": 2,
+          "id": "4acb232c-780d-4a1c-aeaf-11fbe9ad3525",
+          "length": 170000,
+          "title": "BLEED"
+        },
+        {
+          "title": "I THOUGHT THAT I NEEDED YOU",
+          "position": 3,
+          "id": "4cfbd92f-01f3-4d07-8331-f83c2dc9fa9f",
+          "length": 171000,
+          "number": "3",
+          "recording": {
+            "title": "I THOUGHT THAT I NEEDED YOU",
+            "video": false,
+            "id": "bdb76ec0-64ef-4767-a8e2-c1a971fd6e69",
+            "length": 171000,
+            "disambiguation": "",
+            "first-release-date": "2023-11-10"
+          }
+        },
+        {
+          "title": "WHERE DO YOU SLEEP?",
+          "number": "4",
+          "recording": {
+            "title": "WHERE DO YOU SLEEP?",
+            "video": false,
+            "id": "ab91d2ca-ea61-4622-a3ff-3d8d2b04bb14",
+            "length": 192000,
+            "disambiguation": "",
+            "first-release-date": "2023-11-10"
+          },
+          "position": 4,
+          "length": 192000,
+          "id": "60be45d8-f1d7-43fa-bdcc-acb1a8eed96a"
+        },
+        {
+          "number": "5",
+          "recording": {
+            "video": false,
+            "title": "TOO MUCH",
+            "id": "1f1e249c-deb2-4672-aaeb-b18d4c24cc57",
+            "length": 203000,
+            "disambiguation": "",
+            "first-release-date": "2023-10-19"
+          },
+          "position": 5,
+          "id": "0d6e6cf0-5e61-45d9-9d3d-861ed7a19b7b",
+          "length": 204000,
+          "title": "TOO MUCH"
+        },
+        {
+          "title": "TEAR ME APART",
+          "length": 115000,
+          "position": 6,
+          "id": "21143a91-79ea-4f3e-9dc0-d554944cdd23",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-10",
+            "video": false,
+            "title": "TEAR ME APART",
+            "id": "5a99b1a2-ba12-4915-821e-53b7a70b0f63",
+            "length": 114000
+          },
+          "number": "6"
+        },
+        {
+          "title": "STRANGERS (Interlude)",
+          "position": 7,
+          "id": "86a8500c-d24f-43c5-8460-e84f92ae6dbe",
+          "length": 26000,
+          "number": "7",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-10",
+            "video": false,
+            "title": "STRANGERS (Interlude)",
+            "id": "60aeaaf3-6880-4a46-8e8e-6354cd36e524",
+            "length": 25000
+          }
+        },
+        {
+          "length": 87000,
+          "position": 8,
+          "id": "17663fde-299e-4687-a728-776ec10053b5",
+          "recording": {
+            "first-release-date": "2023-11-10",
+            "disambiguation": "",
+            "id": "1942ae28-ee62-47ba-b1bd-a98264cbaf9b",
+            "length": 86026,
+            "video": false,
+            "title": "NIGHTS LIKE THIS"
+          },
+          "number": "8",
+          "title": "NIGHTS LIKE THIS"
+        },
+        {
+          "position": 9,
+          "id": "4adc5e48-c6f3-4bec-ada1-26c4bae0938e",
+          "length": 200000,
+          "number": "9",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-08",
+            "video": false,
+            "title": "WHAT'S THE MOVE?",
+            "id": "de76245a-f9df-4b08-91bb-0a713e7e3ee8",
+            "length": 199000
+          },
+          "title": "WHAT'S THE MOVE?"
+        },
+        {
+          "id": "f25c9ab5-396a-499c-a3c1-7a2b0b05b1b6",
+          "position": 10,
+          "length": 44000,
+          "number": "10",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-10",
+            "title": "STRANGERS PT 2 (Interlude)",
+            "video": false,
+            "length": 43000,
+            "id": "91d92c2e-21fe-4c24-b314-a325ffc83d13"
+          },
+          "title": "STRANGERS PT 2 (Interlude)"
+        },
+        {
+          "title": "CALL ME INSTEAD",
+          "recording": {
+            "video": false,
+            "title": "CALL ME INSTEAD",
+            "id": "927251d4-29ee-4c7e-893f-1a8c0b55b3c9",
+            "length": 197000,
+            "disambiguation": "",
+            "first-release-date": "2023-11-10"
+          },
+          "number": "11",
+          "position": 11,
+          "length": 198000,
+          "id": "6ed3dc24-e0cc-4752-84f5-e848fe357f43"
+        },
+        {
+          "title": "DESERVE YOU",
+          "length": 158000,
+          "position": 12,
+          "id": "8d6c56b2-7da4-4f29-9d1b-66931b58ec2f",
+          "number": "12",
+          "recording": {
+            "id": "b46ede98-fb31-44fd-a2f9-f06cb8ab244d",
+            "length": 157000,
+            "title": "DESERVE YOU",
+            "video": false,
+            "first-release-date": "2023-11-10",
+            "disambiguation": ""
+          }
+        },
+        {
+          "position": 13,
+          "length": 157000,
+          "id": "7e683017-4777-4b78-a156-d3449b5a36c0",
+          "number": "13",
+          "recording": {
+            "length": 157000,
+            "id": "57775c9c-fd13-4a08-a293-cff391e3f1ce",
+            "video": false,
+            "title": "WHAT WENT WRONG???",
+            "first-release-date": "2023-11-10",
+            "disambiguation": ""
+          },
+          "title": "WHAT WENT WRONG???"
+        },
+        {
+          "title": "THE LINE",
+          "id": "eb820330-e498-4db0-a70e-ca2c607c4a7f",
+          "position": 14,
+          "length": 152000,
+          "number": "14",
+          "recording": {
+            "id": "7bf488d0-a544-4a98-a559-9edd6982cf77",
+            "length": 152000,
+            "title": "THE LINE",
+            "video": false,
+            "first-release-date": "2023-11-10",
+            "disambiguation": ""
+          }
+        },
+        {
+          "recording": {
+            "first-release-date": "2023-10-27",
+            "disambiguation": "",
+            "id": "2bc0c09b-4778-4b30-9a4c-c1283d0bf962",
+            "length": 162191,
+            "video": false,
+            "title": "WHAT JUST HAPPENED"
+          },
+          "number": "15",
+          "position": 15,
+          "id": "07a27871-0e51-4b71-ad13-45a75b15ad01",
+          "length": 163000,
+          "title": "WHAT JUST HAPPENED"
+        },
+        {
+          "title": "YOU",
+          "recording": {
+            "length": 136000,
+            "id": "781f35c1-bb1d-42da-81ee-97249dfabef2",
+            "video": false,
+            "title": "YOU",
+            "first-release-date": "2023-11-10",
+            "disambiguation": ""
+          },
+          "number": "16",
+          "position": 16,
+          "length": 137000,
+          "id": "40999131-46b8-4730-9b69-28962043cbb8"
+        },
+        {
+          "title": "LOVE AGAIN",
+          "position": 17,
+          "length": 146000,
+          "id": "e9986e68-484c-4e44-b7be-64808017a1f2",
+          "recording": {
+            "first-release-date": "2023-12-05",
+            "disambiguation": "",
+            "length": 146000,
+            "id": "e27a5230-d366-446e-9896-6d35ee645301",
+            "title": "LOVE AGAIN",
+            "video": false
+          },
+          "number": "17"
+        },
+        {
+          "title": "WHERE DOES YOUR SPIRIT GO?",
+          "id": "518c87a7-e732-4904-abca-02bdea055b25",
+          "position": 18,
+          "length": 206000,
+          "number": "18",
+          "recording": {
+            "first-release-date": "2023-11-10",
+            "disambiguation": "",
+            "id": "d9997735-2a35-4dde-9c2c-39f7f39b3a8d",
+            "length": 205000,
+            "title": "WHERE DOES YOUR SPIRIT GO?",
+            "video": false
+          }
+        },
+        {
+          "title": "YOU NEVER FORGET YOUR FIRST TIME...",
+          "id": "979105be-c395-4588-a31f-0b8589f18f5d",
+          "position": 19,
+          "length": 125000,
+          "number": "19",
+          "recording": {
+            "disambiguation": "",
+            "first-release-date": "2023-11-10",
+            "video": false,
+            "title": "YOU NEVER FORGET YOUR FIRST TIME...",
+            "id": "842d2b28-ac2a-4e78-a08b-025d290f29b8",
+            "length": 124000
+          }
+        },
+        {
+          "title": "KIDS ARE GROWING UP",
+          "recording": {
+            "video": false,
+            "title": "KIDS ARE GROWING UP",
+            "id": "32a931b4-9b51-49a9-b858-88267c1ccde5",
+            "length": 260000,
+            "disambiguation": "",
+            "first-release-date": "2023-11-10"
+          },
+          "number": "20",
+          "position": 20,
+          "id": "44667368-5ef7-47c4-9b97-9a90466cb6fc",
+          "length": 261000
+        }
+      ],
+      "position": 1
+    }
+  ]
+}

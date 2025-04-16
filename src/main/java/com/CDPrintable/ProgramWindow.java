@@ -18,6 +18,12 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 public class ProgramWindow {
@@ -25,6 +31,7 @@ public class ProgramWindow {
     private JLabel fullUserAgentLabel = new JLabel();
     private final JPanel cdSearchPanel = new JPanel();
     private final JLabel searchStatusLabel = new JLabel("Status: Nothing's going on.");
+    private static final ArrayList<String> idList = new ArrayList<>();
 
     /**
      * Creates a new ProgramWindow and sets up the GUI.
@@ -83,7 +90,17 @@ public class ProgramWindow {
         trackListPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
 
         // Search table set up
-        JTable searchTable = new JTable(getCDStubModel());
+        JTable searchTable = new JTable(getTableModel("CDStub"));
+        searchTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = searchTable.rowAtPoint(e.getPoint());
+                int column = searchTable.columnAtPoint(e.getPoint());
+                if (row != -1 && column != -1) {
+                    clickSearch(row, column, searchTable);
+                }
+            }
+        });
         JScrollPane trackListScrollPane = new JScrollPane(searchTable);
         trackListPanel.add(searchStatusLabel, BorderLayout.NORTH);
         trackListPanel.add(trackListScrollPane, BorderLayout.CENTER);
@@ -104,38 +121,51 @@ public class ProgramWindow {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
             }
-            setSearchStatus("Preforming search...", "blue");
-            if (searchTypeComboBox.getSelectedItem().equals("CDStub")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("cdstub", searchField.getText());
 
-                    // Get CDStubs and set the table model
-                    MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
-                    searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
-                    setSearchStatus("All done!", "green");
-                });
-            } else if (searchTypeComboBox.getSelectedItem().equals("Artist")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("artist", searchField.getText());
-
-                    // Get Artists and set the table model
-                    MusicBrainzArtist[] artists = reader.getArtists();
-                    searchTable.setModel(reader.getArtistsAsTableModel(artists));
-                    setSearchStatus("All done!", "green");
-                });
-            } else if (searchTypeComboBox.getSelectedItem().equals("Release")) {
-                Constants.THREAD_MANAGER.submit(() -> {
-                    MusicBrainzJSONReader reader = sendRequest("release", searchField.getText());
-
-                    // Get Releases and set the table model
-                    MusicBrainzRelease[] releases = reader.getReleases();
-                    searchTable.setModel(reader.getReleasesAsTableModel(releases));
-                    setSearchStatus("All done!", "green");
-                });
+            String selectedItem = searchTypeComboBox.getSelectedItem().toString();
+            if (selectedItem != null) {
+                searchTable.setModel(getTableModel(selectedItem));
             } else {
-                // how does this even happen?
-                JOptionPane.showMessageDialog(panel, "Please select a search type.");
+                selectedItem = "";
             }
+
+            setSearchStatus("Preforming search...", "blue");
+            clearIdList();
+            String finalSelectedItem = selectedItem;
+            Constants.THREAD_MANAGER.submit(() -> {
+                MusicBrainzJSONReader reader = sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), searchField.getText());
+                switch (finalSelectedItem) {
+                    case "CDStub" -> {
+                        // Get CDStubs and set the table model
+                        MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                        for (MusicBrainzCDStub cdStub : cdStubs) {
+                            addId(cdStub.getId());
+                        }
+                        setSearchStatus("All done!", "green");
+                        searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
+                    }
+                    case "Artist" -> {
+                        // Get Artists and set the table model
+                        MusicBrainzArtist[] artists = reader.getArtists();
+                        for (MusicBrainzArtist artist : artists) {
+                            addId(artist.getId());
+                        }
+                        setSearchStatus("All done!", "green");
+                        searchTable.setModel(reader.getArtistsAsTableModel(artists));
+                    }
+                    case "Release" -> {
+                        // Get Releases and set the table model
+                        MusicBrainzRelease[] releases = reader.getReleases();
+                        for (MusicBrainzRelease release : releases) {
+                            addId(release.getId());
+                        }
+                        setSearchStatus("All done!", "green");
+                        searchTable.setModel(reader.getReleasesAsTableModel(releases));
+                    }
+                    default -> JOptionPane.showMessageDialog(panel, "Please select a search type.");
+                }
+            });
+
             resizeColumnWidths(searchTable);
         });
 
@@ -176,33 +206,30 @@ public class ProgramWindow {
     }
 
     /**
-     * Gets a default table model for CDStubs.
-     * @return A DefaultTableModel with the correct columns.
+     * Helper method to get a table model
+     * @param model The model to get.
      */
-    private DefaultTableModel getCDStubModel() {
-        String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
-        String[][] data = {{"", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
-    }
-
-    /**
-     * Gets a default table model for Artists.
-     * @return A DefaultTableModel with the correct columns.
-     */
-    private DefaultTableModel getArtistModel() {
-        String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
-        String[][] data = {{"", "", "", "", "", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
-    }
-
-    /**
-     * Gets a default table model for Releases.
-     * @return A DefaultTableModel with the correct columns.
-     */
-    private DefaultTableModel getReleaseModel() {
-        String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
-        String[][] data = {{"", "", "", ""}};
-        return new javax.swing.table.DefaultTableModel(data, columnNames);
+    private DefaultTableModel getTableModel(String model) {
+        switch (model) {
+            case "CDStub" -> {
+                String[] columnNames = {"Disc Name", "Artist", "Track Count"};
+                String[][] data = {{"", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            case "Artist" -> {
+                String[] columnNames = {"Artist Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country"};
+                String[][] data = {{"", "", "", "", "", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            case "Release" -> {
+                String[] columnNames = {"Release Name", "Artist", "Track Count", "Date"};
+                String[][] data = {{"", "", ""}};
+                return new DefaultTableModel(data, columnNames);
+            }
+            default -> {
+                return new DefaultTableModel(new String [][] {{}}, new String[] {});
+            }
+        }
     }
 
     /**
@@ -326,7 +353,119 @@ public class ProgramWindow {
         }
     }
 
+    /**
+     * Sets the search status label.
+     * @param status The status to set.
+     * @param color The color to set.
+     */
     public void setSearchStatus(String status, String color) {
         searchStatusLabel.setText("<html><font color='" + color + "'>Status: " + status + "</font></html>");
     }
+
+    /**
+     * Adds an ID to the list of IDs.
+     * @param id The ID to add.
+     */
+    public static void addId(String id) {
+        idList.add(id);
+    }
+
+    /**
+     * Clears the list of IDs.
+     */
+    public static void clearIdList() {
+        idList.clear();
+    }
+
+    /**
+     * Helper method to search specific data (Artists, Releases, etc.) in the search table.
+     * @param row The row where the object is located.
+     * @param col The column where the object is located.
+     */
+    private void clickSearch(int row, int col, JTable table) {
+        String typeOfTable = table.getColumnName(0);
+        System.out.println("Clicked at: " + row + ", " + col);
+        switch (typeOfTable) {
+            case "Disc Name" -> {
+                if (col == 0 && row >= 0) {
+                    setSearchStatus("Fetching Tracks...", "blue");
+                    System.out.println("This kinda works");
+                    String response = getDiscTrackListResponseString(row);
+                    MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
+                    DefaultTableModel model = reader.getTracksAsTableModel(reader.getTracks());
+                    JTable trackTable = new JTable(model);
+                    resizeColumnWidths(trackTable);
+                    JScrollPane trackScrollPane = new JScrollPane(trackTable);
+                    setSearchStatus("All Done!", "green");
+                    JOptionPane.showMessageDialog(null, trackScrollPane, "Tracks", JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+            case "Release Name" -> {
+                if (col == 0 && row >= 0) {
+                    setSearchStatus("Fetching Tracks...", "blue");
+                    System.out.println("This also kinda works");
+                    String response = getReleaseTrackListResponseString(row);
+                    MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
+                    MusicBrainzTrack[] tracks = reader.getReleaseTracks();
+                    DefaultTableModel model = reader.getTracksAsTableModel(tracks);
+
+                    String title = table.getValueAt(row, 0).toString();
+                    String artist = table.getValueAt(row, 1).toString();
+                    int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+                    String date = table.getValueAt(row, 3).toString();
+
+                    JPanel mainPanel = new JPanel(new BorderLayout());
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+                    panel.add(new JLabel("Title: " + title));
+                    panel.add(new JLabel("Artist: " + artist));
+                    panel.add(new JLabel("Track Count: " + trackCount));
+                    panel.add(new JLabel("Date: " + date));
+                    JTable trackTable = new JTable(model);
+                    resizeColumnWidths(trackTable);
+                    JScrollPane trackScrollPane = new JScrollPane(trackTable);
+
+                    mainPanel.add(panel, BorderLayout.NORTH);
+                    mainPanel.add(trackScrollPane, BorderLayout.CENTER);
+                    mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
+
+                    setSearchStatus("All Done!", "green");
+                    // the worst she can say is no...
+                    int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        System.out.println("give me redbull");
+                    } else if (result == JOptionPane.NO_OPTION) {
+                        System.out.println("give me beer");
+                    }
+                }
+            }
+        }
+    }
+
+    private String getDiscTrackListResponseString(int row) {
+        MusicBrainzRequest request = new MusicBrainzRequest("tracks", idList.get(row));
+        WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
+        String response;
+        try {
+            response = webRequest.sendRequest();
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+    private String getReleaseTrackListResponseString(int row) {
+        MusicBrainzRequest request = new MusicBrainzRequest("release", idList.get(row));
+        WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
+        String response;
+        try {
+            response = webRequest.sendRequest();
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        return response;
+    }
+
+
 }
