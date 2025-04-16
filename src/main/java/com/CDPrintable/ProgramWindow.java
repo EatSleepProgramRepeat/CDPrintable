@@ -388,23 +388,29 @@ public class ProgramWindow {
         switch (typeOfTable) {
             case "Disc Name" -> {
                 if (col == 0 && row >= 0) {
+                    setSearchStatus("Fetching Tracks...", "blue");
                     System.out.println("This kinda works");
                     String response = getDiscTrackListResponseString(row);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
                     DefaultTableModel model = reader.getTracksAsTableModel(reader.getTracks());
                     JTable trackTable = new JTable(model);
+                    resizeColumnWidths(trackTable);
                     JScrollPane trackScrollPane = new JScrollPane(trackTable);
+                    setSearchStatus("All Done!", "green");
                     JOptionPane.showMessageDialog(null, trackScrollPane, "Tracks", JOptionPane.PLAIN_MESSAGE);
                 }
             }
             case "Release Name" -> {
                 if (col == 0 && row >= 0) {
+                    setSearchStatus("Fetching Tracks...", "blue");
                     System.out.println("This also kinda works");
                     String response = getReleaseTrackListResponseString(row);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
                     DefaultTableModel model = reader.getTracksAsTableModel(reader.getReleaseTracks());
                     JTable trackTable = new JTable(model);
+                    resizeColumnWidths(trackTable);
                     JScrollPane trackScrollPane = new JScrollPane(trackTable);
+                    setSearchStatus("All Done!", "green");
                     JOptionPane.showMessageDialog(null, trackScrollPane, "Tracks", JOptionPane.PLAIN_MESSAGE);
                 }
             }
@@ -434,4 +440,6 @@ public class ProgramWindow {
         }
         return response;
     }
+
+
 }
