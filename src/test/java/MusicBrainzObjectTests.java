@@ -42,19 +42,34 @@ public class MusicBrainzObjectTests {
             "{\"invalidKey\": []}, cdstubs",
             "{\"cdstubs\": []}, cdstubs",
             "{\"invalidKey\": []}, artists",
-            "{\"artists\": []}, artists"
+            "{\"artists\": []}, artists",
+            "{\"invalidKey\": []}, tracks",
+            "{\"tracks\": []}, tracks"
     })
     void testGetItemsWithInvalidJsonStructure(String jsonString, String key) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(jsonString);
 
-        if (key.equals("releases")) {
-            MusicBrainzRelease[] releases = reader.getReleases();
-            assertNotNull(releases);
-            assertEquals(0, releases.length);
-        } else if (key.equals("cdstubs")) {
-            MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
-            assertNotNull(cdStubs);
-            assertEquals(0, cdStubs.length);
+        switch (key) {
+            case "releases" -> {
+                MusicBrainzRelease[] releases = reader.getReleases();
+                assertNotNull(releases);
+                assertEquals(0, releases.length);
+            }
+            case "cdstubs" -> {
+                MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                assertNotNull(cdStubs);
+                assertEquals(0, cdStubs.length);
+            }
+            case "artists" -> {
+                MusicBrainzArtist[] artists = reader.getArtists();
+                assertNotNull(artists);
+                assertEquals(0, artists.length);
+            }
+            case "tracks" -> {
+                MusicBrainzTrack[] tracks = reader.getTracks();
+                assertNotNull(tracks);
+                assertEquals(0, tracks.length);
+            }
         }
     }
 
@@ -67,30 +82,56 @@ public class MusicBrainzObjectTests {
     @CsvSource({
             "{\"releases\": [{\"title\": null, \"date\": null, \"count\": null, \"id\": null, \"artist-credit\": []}]}, releases",
             "{\"cdstubs\": [{\"title\": null, \"id\": null, \"count\": null, \"artist\": null}]}, cdstubs",
-            "{\"artists\": [{\"name\": null, \"sort-name\": null, \"country\": null, \"gender\": null, \"disambiguation\": null, \"life-span\": null}]}, artists"
+            "{\"artists\": [{\"name\": null, \"sort-name\": null, \"country\": null, \"gender\": null, \"disambiguation\": null, \"life-span\": null}]}, artists",
+            "{\"tracks\": [{\"title\": null, \"id\": null, \"count\": null, \"artist\": null}]}, tracks"
     })
     void testGetItemsWithMissingOrNullFields(String jsonString, String key) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(jsonString);
 
-        if (key.equals("releases")) {
-            MusicBrainzRelease[] releases = reader.getReleases();
-            assertNotNull(releases);
-            assertEquals(1, releases.length);
+        switch (key) {
+            case "releases" -> {
+                MusicBrainzRelease[] releases = reader.getReleases();
+                assertNotNull(releases);
+                assertEquals(1, releases.length);
 
-            assertNull(releases[0].getTitle());
-            assertNull(releases[0].getDate());
-            assertEquals(-1, releases[0].getTrackCount());
-            assertNull(releases[0].getId());
-            assertEquals(0, releases[0].getArtists().length);
-        } else if (key.equals("cdstubs")) {
-            MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
-            assertNotNull(cdStubs);
-            assertEquals(1, cdStubs.length);
+                assertNull(releases[0].getTitle());
+                assertNull(releases[0].getDate());
+                assertEquals(-1, releases[0].getTrackCount());
+                assertNull(releases[0].getId());
+                assertEquals(0, releases[0].getArtists().length);
+            }
+            case "cdstubs" -> {
+                MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
+                assertNotNull(cdStubs);
+                assertEquals(1, cdStubs.length);
 
-            assertNull(cdStubs[0].getTitle());
-            assertNull(cdStubs[0].getId());
-            assertEquals(-1, cdStubs[0].getTrackCount());
-            assertNull(cdStubs[0].getArtists()[0]);
+                assertNull(cdStubs[0].getTitle());
+                assertNull(cdStubs[0].getId());
+                assertEquals(-1, cdStubs[0].getTrackCount());
+                assertNull(cdStubs[0].getArtists()[0]);
+            }
+            case "artists" -> {
+                MusicBrainzArtist[] artists = reader.getArtists();
+                assertNotNull(artists);
+                assertEquals(1, artists.length);
+
+                assertNull(artists[0].getName());
+                assertNull(artists[0].getSortName());
+                assertNull(artists[0].getCountry());
+                assertNull(artists[0].getGender());
+                assertNull(artists[0].getDisambiguation());
+                assertNull(artists[0].getLifeSpan());
+            }
+            case "tracks" -> {
+                MusicBrainzTrack[] tracks = reader.getTracks();
+                assertNotNull(tracks);
+                assertEquals(1, tracks.length);
+
+                assertNull(tracks[0].getTitle());
+                assertNull(tracks[0].getId());
+                assertEquals(-1, tracks[0].getTrackNumber());
+                assertNull(tracks[0].getArtist());
+            }
         }
     }
 
@@ -112,27 +153,48 @@ public class MusicBrainzObjectTests {
             "cdstubs, false, {}",                       // case 2
             "artists, true, null",                      // case 1
             "artists, false, {}",                       // case 2
+            "tracks, true, null",                       // case 1
+            "tracks, false, {}",                        // case 2
             "releases, false, {\"releases\": null}",    // case 3
             "cdstubs, false, {\"cdstubs\": null}",      // case 3
             "artists, false, {\"artists\": null}",      // case 3
+            "tracks, false, {\"tracks\": null}",        // case 3
             "releases, false, {\"invalidKey\": []}",    // case 4
             "cdstubs, false, {\"invalidKey\": []}",     // case 4
-            "artists, false, {\"invalidKey\": []}"      // case 4
+            "artists, false, {\"invalidKey\": []}",     // case 4
+            "tracks, false, {\"invalidKey\": []}"       // case 4
     })
     void testGetTableModelWithArrayIssues(String key, boolean isNull, String readerJson) {
         MusicBrainzJSONReader reader = new MusicBrainzJSONReader(readerJson != null ? readerJson : "");
-        if (key.equals("releases")) {
-            MusicBrainzRelease[] releases = isNull ? null : new MusicBrainzRelease[0];
-            DefaultTableModel tableModel = reader.getReleasesAsTableModel(releases);
+        switch (key) {
+            case "releases" -> {
+                MusicBrainzRelease[] releases = isNull ? null : new MusicBrainzRelease[0];
+                DefaultTableModel tableModel = reader.getReleasesAsTableModel(releases);
 
-            assertNotNull(tableModel);
-            assertEquals(0, tableModel.getRowCount());
-        } else if (key.equals("cdstubs")) {
-            MusicBrainzCDStub[] cdStubs = isNull ? null : new MusicBrainzCDStub[0];
-            DefaultTableModel tableModel = reader.getCDStubsAsTableModel(cdStubs);
+                assertNotNull(tableModel);
+                assertEquals(0, tableModel.getRowCount());
+            }
+            case "cdstubs" -> {
+                MusicBrainzCDStub[] cdStubs = isNull ? null : new MusicBrainzCDStub[0];
+                DefaultTableModel tableModel = reader.getCDStubsAsTableModel(cdStubs);
 
-            assertNotNull(tableModel);
-            assertEquals(0, tableModel.getRowCount());
+                assertNotNull(tableModel);
+                assertEquals(0, tableModel.getRowCount());
+            }
+            case "artists" -> {
+                MusicBrainzArtist[] artists = isNull ? null : new MusicBrainzArtist[0];
+                DefaultTableModel tableModel = reader.getArtistsAsTableModel(artists);
+
+                assertNotNull(tableModel);
+                assertEquals(0, tableModel.getRowCount());
+            }
+            case "tracks" -> {
+                MusicBrainzTrack[] tracks = isNull ? null : new MusicBrainzTrack[0];
+                DefaultTableModel tableModel = reader.getTracksAsTableModel(tracks);
+
+                assertNotNull(tableModel);
+                assertEquals(0, tableModel.getRowCount());
+            }
         }
     }
 
@@ -226,6 +288,16 @@ public class MusicBrainzObjectTests {
         assertEquals("hip hop", artists[1].getDisambiguation());
         assertNull(artists[1].getLifeSpan());
         assertEquals("Australia", artists[1].getCountry());
+
+    }
+
+    /**
+     * Test the JSON reader against the example JSON files. This is effectively
+     * normal operation for the program.
+     * This test is for Tracks.
+     */
+    @Test
+    public void genericGetTracksTest() {
 
     }
 

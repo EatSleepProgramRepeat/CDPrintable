@@ -370,13 +370,12 @@ public class MusicBrainzJSONReader {
      * @param trackArray The array of tracks.
      */
     public DefaultTableModel getTracksAsTableModel(MusicBrainzTrack[] trackArray) {
-        String[] columnNames = {"#", "Track Name", "Artist", "Length"};
+        String[] columnNames = {"#", "Track Name", "Length"};
         return createTableModel(trackArray, columnNames, item -> {
             MusicBrainzTrack track = (MusicBrainzTrack) item;
             return new String[]{
                     getOrDefault(Integer.toString(track.getTrackNumber())),
                     getOrDefault(track.getTitle()),
-                    getOrDefault(track.getArtist()),
                     getOrDefault(track.getLength())
             };
         });
