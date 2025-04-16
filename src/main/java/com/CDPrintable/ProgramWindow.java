@@ -406,12 +406,38 @@ public class ProgramWindow {
                     System.out.println("This also kinda works");
                     String response = getReleaseTrackListResponseString(row);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-                    DefaultTableModel model = reader.getTracksAsTableModel(reader.getReleaseTracks());
+                    MusicBrainzTrack[] tracks = reader.getReleaseTracks();
+                    DefaultTableModel model = reader.getTracksAsTableModel(tracks);
+
+                    String title = table.getValueAt(row, 0).toString();
+                    String artist = table.getValueAt(row, 1).toString();
+                    int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+                    String date = table.getValueAt(row, 3).toString();
+
+                    JPanel mainPanel = new JPanel(new BorderLayout());
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+                    panel.add(new JLabel("Title: " + title));
+                    panel.add(new JLabel("Artist: " + artist));
+                    panel.add(new JLabel("Track Count: " + trackCount));
+                    panel.add(new JLabel("Date: " + date));
                     JTable trackTable = new JTable(model);
                     resizeColumnWidths(trackTable);
                     JScrollPane trackScrollPane = new JScrollPane(trackTable);
+
+                    mainPanel.add(panel, BorderLayout.NORTH);
+                    mainPanel.add(trackScrollPane, BorderLayout.CENTER);
+                    mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
+
                     setSearchStatus("All Done!", "green");
-                    JOptionPane.showMessageDialog(null, trackScrollPane, "Tracks", JOptionPane.PLAIN_MESSAGE);
+                    // the worst she can say is no...
+                    int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        System.out.println("give me redbull");
+                    } else if (result == JOptionPane.NO_OPTION) {
+                        System.out.println("give me beer");
+                    }
                 }
             }
         }
