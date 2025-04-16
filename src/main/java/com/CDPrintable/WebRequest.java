@@ -44,6 +44,16 @@ public class WebRequest {
     }
 
     /**
+     * Constructor for WebRequest. Makes a web request to the MusicBrainz API according to the given URL.
+     * @param url The URL to use.
+     * @param userAgent The user agent to use.
+     */
+    public WebRequest(String url, UserAgent userAgent) {
+        this.url = url;
+        this.userAgent = userAgent.toString();
+    }
+
+    /**
      * Sends the request to the MusicBrainz API and returns the response.
      * @return The response from the MusicBrainz API.
      * @throws IOException If an I/O error occurs. Usually happens when the HTTP status code is not 200.

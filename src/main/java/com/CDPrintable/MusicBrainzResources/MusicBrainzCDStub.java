@@ -10,7 +10,7 @@
 
 package com.CDPrintable.MusicBrainzResources;
 
-public class MusicBrainzCDStub {
+public class MusicBrainzCDStub extends MusicBrainzDataObject {
     private String id;
     private String title;
     private String[] artists;

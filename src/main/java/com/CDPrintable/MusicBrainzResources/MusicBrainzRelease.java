@@ -10,7 +10,7 @@
 
 package com.CDPrintable.MusicBrainzResources;
 
-public class MusicBrainzRelease {
+public class MusicBrainzRelease extends MusicBrainzDataObject {
     private String title;
     private String[] artists;
     private String date;

@@ -11,6 +11,7 @@
 package com.CDPrintable.MusicBrainzResources;
 
 import com.CDPrintable.Constants;
+import com.CDPrintable.ProgramWindow;
 import com.google.gson.*;
 
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ public class MusicBrainzJSONReader {
 
     /*
      * Creates a MusicBrainzJSONReader from a JSON string.
-     * @param json The JSON string.
+     * @param JSON The JSON string.
      * @throws IllegalArgumentException If the JSON is invalid.
      */
     public MusicBrainzJSONReader(String json) throws IllegalArgumentException {
@@ -241,6 +242,49 @@ public class MusicBrainzJSONReader {
     }
 
     /**
+     * Gets track listing from the JSON from a discID.
+     */
+    public MusicBrainzTrack[] getTracks() {
+        return parseJsonArray("tracks", jsonObject -> {
+            String title = jsonHasAndIsNotNull(jsonObject, "title") ? jsonObject.get("title").getAsString() : null;
+            String artist = jsonHasAndIsNotNull(jsonObject, "artist") ? jsonObject.get("artist").getAsString() : null;
+            int length = jsonHasAndIsNotNull(jsonObject, "length") ? jsonObject.get("length").getAsInt() : -1;
+
+            return new MusicBrainzTrack(title, artist, length);
+        }, new MusicBrainzTrack[0]);
+    }
+
+    /**
+     * Gets track listing from a release.
+     * @return An array of MusicBrainzTrack objects.
+     */
+    public MusicBrainzTrack[] getReleaseTracks() {
+        List<MusicBrainzTrack> trackList = new ArrayList<>();
+
+        JsonArray mediaArray = json.getAsJsonArray("media");
+        for (JsonElement mediaElement : mediaArray) {
+            JsonObject mediaObject = mediaElement.getAsJsonObject(); // Cast each element to JsonObject
+            JsonArray trackArray = mediaObject.getAsJsonArray("tracks");
+            for (JsonElement trackElement : trackArray) {
+                JsonObject trackObject = trackElement.getAsJsonObject();
+                String title = jsonHasAndIsNotNull(trackObject, "title") ? trackObject.get("title").getAsString() : null;
+                int length = jsonHasAndIsNotNull(trackObject, "length") ? trackObject.get("length").getAsInt() : -1;
+                int trackNumber = -1;
+
+                if (trackObject.has("number")) {
+                    trackNumber = trackObject.get("number").getAsInt();
+                } else if (trackObject.has("position")) {
+                    trackNumber = trackObject.get("position").getAsInt();
+                }
+
+                trackList.add(new MusicBrainzTrack(title, null, length, trackNumber));
+            }
+        }
+
+        return trackList.toArray(new MusicBrainzTrack[0]);
+    }
+
+    /**
     * Creates a table model from an array of items.
     * @param items The array of items. Usually a MusicBrainzRelease, MusicBrainzCDStub, etc.
     * @param columnNames The names of the columns.
@@ -266,15 +310,15 @@ public class MusicBrainzJSONReader {
      * @return The table model.
      */
     public DefaultTableModel getReleasesAsTableModel(MusicBrainzRelease[] releaseArray) {
-        String[] columnNames = {"Release Name", "Artist", "Track Count", "Date", ""};
+        String[] columnNames = {"Release Name", "Artist", "Track Count", "Date"};
         return createTableModel(releaseArray, columnNames, item -> {
             MusicBrainzRelease release = (MusicBrainzRelease) item;
+            ProgramWindow.addId(getOrDefault(release.getId()));
             return new String[]{
                     getOrDefault(release.getTitle()),
                     getOrDefault(release.getArtistsAsString()),
                     getOrDefault(release.getTrackCount() != -1 ? String.valueOf(release.getTrackCount()) : null),
-                    getOrDefault(release.getDate()),
-                    ""
+                    getOrDefault(release.getDate())
             };
         });
     }
@@ -285,14 +329,14 @@ public class MusicBrainzJSONReader {
      * @return The table model.
      */
     public DefaultTableModel getCDStubsAsTableModel(MusicBrainzCDStub[] cdStubArray) {
-        String[] columnNames = {"Disc Name", "Artist", "Track Count", ""};
+        String[] columnNames = {"Disc Name", "Artist", "Track Count"};
         return createTableModel(cdStubArray, columnNames, item -> {
             MusicBrainzCDStub cdStub = (MusicBrainzCDStub) item;
+            ProgramWindow.addId(getOrDefault(cdStub.getId()));
             return new String[]{
                     getOrDefault(cdStub.getTitle()),
                     getOrDefault(cdStub.getArtistsAsString()),
-                    getOrDefault(String.valueOf(cdStub.getTrackCount())),
-                    ""
+                    getOrDefault(String.valueOf(cdStub.getTrackCount()))
             };
         });
     }
@@ -303,9 +347,10 @@ public class MusicBrainzJSONReader {
      * @return The table model.
      */
     public DefaultTableModel getArtistsAsTableModel(MusicBrainzArtist[] artistArray) {
-        String[] columnNames = {"Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country", ""};
+        String[] columnNames = {"Artist Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country"};
         return createTableModel(artistArray, columnNames, item -> {
            MusicBrainzArtist artist = (MusicBrainzArtist) item;
+           ProgramWindow.addId(getOrDefault(artist.getId()));
            return new String[] {
                    getOrDefault(artist.getName()),
                    getOrDefault(artist.getDateOrganized()),
@@ -315,9 +360,25 @@ public class MusicBrainzJSONReader {
                    getOrDefault(artist.getType()),
                    getOrDefault(artist.getDisambiguation()),
                    getOrDefault(artist.getLifeSpan()),
-                   getOrDefault(artist.getCountry()),
-                   ""
+                   getOrDefault(artist.getCountry())
            };
+        });
+    }
+
+    /**
+     * Gets the tracks as a table model.
+     * @param trackArray The array of tracks.
+     */
+    public DefaultTableModel getTracksAsTableModel(MusicBrainzTrack[] trackArray) {
+        String[] columnNames = {"#", "Track Name", "Artist", "Length"};
+        return createTableModel(trackArray, columnNames, item -> {
+            MusicBrainzTrack track = (MusicBrainzTrack) item;
+            return new String[]{
+                    getOrDefault(Integer.toString(track.getTrackNumber())),
+                    getOrDefault(track.getTitle()),
+                    getOrDefault(track.getArtist()),
+                    getOrDefault(track.getLength())
+            };
         });
     }
 
