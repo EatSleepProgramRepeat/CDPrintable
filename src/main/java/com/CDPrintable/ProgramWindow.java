@@ -390,9 +390,13 @@ public class ProgramWindow {
         setSearchStatus("Fetching Tracks...", "blue");
         String response;
         DefaultTableModel model;
-        String title = table.getValueAt(row, 0).toString();
-        String artist = table.getValueAt(row, 1).toString();
-        int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+        String title = "", artist = "";
+        int trackCount = 0;
+        if (Objects.equals(typeOfTable, "Disc Name") || Objects.equals(typeOfTable, "Release Name")) {
+            title = table.getValueAt(row, 0).toString();
+            artist = table.getValueAt(row, 1).toString();
+            trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+        }
 
         switch (typeOfTable) {
             case "Disc Name" -> {
