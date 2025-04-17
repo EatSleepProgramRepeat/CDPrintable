@@ -393,11 +393,35 @@ public class ProgramWindow {
                     String response = getDiscTrackListResponseString(row);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
                     DefaultTableModel model = reader.getTracksAsTableModel(reader.getTracks());
+
+                    String title = table.getValueAt(row, 0).toString();
+                    String artist = table.getValueAt(row, 1).toString();
+                    int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+
+                    JPanel mainPanel = new JPanel(new BorderLayout());
+                    JPanel panel = new JPanel(new BorderLayout());
+                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+                    panel.add(new JLabel("Title: " + title));
+                    panel.add(new JLabel("Artist: " + artist));
+                    panel.add(new JLabel("Track Count: " + trackCount));
+
+                    mainPanel.add(panel, BorderLayout.NORTH);
+
                     JTable trackTable = new JTable(model);
                     resizeColumnWidths(trackTable);
                     JScrollPane trackScrollPane = new JScrollPane(trackTable);
+
+                    mainPanel.add(trackScrollPane, BorderLayout.CENTER);
+                    mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
+
                     setSearchStatus("All Done!", "green");
-                    JOptionPane.showMessageDialog(null, trackScrollPane, "Tracks", JOptionPane.PLAIN_MESSAGE);
+                    int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        System.out.println("give me redbull");
+                    } else if (result == JOptionPane.NO_OPTION) {
+                        System.out.println("give me beer");
+                    }
                 }
             }
             case "Release Name" -> {
@@ -466,6 +490,5 @@ public class ProgramWindow {
         }
         return response;
     }
-
 
 }
