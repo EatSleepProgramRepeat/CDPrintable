@@ -325,7 +325,7 @@ public class ProgramWindow {
         userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
         userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
 
-        // Add subpanels to the main panel
+        // Add sub-panels to the main panel
         panel.add(userAgentPanel);
         panel.add(fontPanel);
 
@@ -385,90 +385,44 @@ public class ProgramWindow {
     private void clickSearch(int row, int col, JTable table) {
         String typeOfTable = table.getColumnName(0);
         System.out.println("Clicked at: " + row + ", " + col);
+        if (row < 0 || col < 0) {return;}
+
+        setSearchStatus("Fetching Tracks...", "blue");
+        String response;
+        DefaultTableModel model;
+        String title = table.getValueAt(row, 0).toString();
+        String artist = table.getValueAt(row, 1).toString();
+        int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+
         switch (typeOfTable) {
             case "Disc Name" -> {
-                if (col == 0 && row >= 0) {
-                    setSearchStatus("Fetching Tracks...", "blue");
-                    System.out.println("This kinda works");
-                    String response = getDiscTrackListResponseString(row);
-                    MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-                    DefaultTableModel model = reader.getTracksAsTableModel(reader.getTracks());
-
-                    String title = table.getValueAt(row, 0).toString();
-                    String artist = table.getValueAt(row, 1).toString();
-                    int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
-
-                    JPanel mainPanel = new JPanel(new BorderLayout());
-                    JPanel panel = new JPanel(new BorderLayout());
-                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-                    panel.add(new JLabel("Title: " + title));
-                    panel.add(new JLabel("Artist: " + artist));
-                    panel.add(new JLabel("Track Count: " + trackCount));
-
-                    mainPanel.add(panel, BorderLayout.NORTH);
-
-                    JTable trackTable = new JTable(model);
-                    resizeColumnWidths(trackTable);
-                    JScrollPane trackScrollPane = new JScrollPane(trackTable);
-
-                    mainPanel.add(trackScrollPane, BorderLayout.CENTER);
-                    mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
-
-                    setSearchStatus("All Done!", "green");
-                    int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
-                    if (result == JOptionPane.YES_OPTION) {
-                        System.out.println("give me redbull");
-                    } else if (result == JOptionPane.NO_OPTION) {
-                        System.out.println("give me beer");
-                    }
+                if (col == 0) {
+                    response = getTrackListResponseString(row, "tracks");
+                    model = new MusicBrainzJSONReader(response).getTracksAsTableModel(new MusicBrainzJSONReader(response).getTracks());
+                    createTrackDialog(title, artist, trackCount, null, model);
                 }
             }
             case "Release Name" -> {
-                if (col == 0 && row >= 0) {
-                    setSearchStatus("Fetching Tracks...", "blue");
-                    System.out.println("This also kinda works");
-                    String response = getReleaseTrackListResponseString(row);
+                if (col == 0) {
+                    response = getTrackListResponseString(row, "release");
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-                    MusicBrainzTrack[] tracks = reader.getReleaseTracks();
-                    DefaultTableModel model = reader.getTracksAsTableModel(tracks);
-
-                    String title = table.getValueAt(row, 0).toString();
-                    String artist = table.getValueAt(row, 1).toString();
-                    int trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+                    model = reader.getTracksAsTableModel(reader.getReleaseTracks());
                     String date = table.getValueAt(row, 3).toString();
-
-                    JPanel mainPanel = new JPanel(new BorderLayout());
-                    JPanel panel = new JPanel(new BorderLayout());
-                    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-                    panel.add(new JLabel("Title: " + title));
-                    panel.add(new JLabel("Artist: " + artist));
-                    panel.add(new JLabel("Track Count: " + trackCount));
-                    panel.add(new JLabel("Date: " + date));
-                    JTable trackTable = new JTable(model);
-                    resizeColumnWidths(trackTable);
-                    JScrollPane trackScrollPane = new JScrollPane(trackTable);
-
-                    mainPanel.add(panel, BorderLayout.NORTH);
-                    mainPanel.add(trackScrollPane, BorderLayout.CENTER);
-                    mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
-
-                    setSearchStatus("All Done!", "green");
-                    // the worst she can say is no...
-                    int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
-                    if (result == JOptionPane.YES_OPTION) {
-                        System.out.println("give me redbull");
-                    } else if (result == JOptionPane.NO_OPTION) {
-                        System.out.println("give me beer");
-                    }
+                    createTrackDialog(title, artist, trackCount, date, model);
                 }
             }
         }
+        setSearchStatus("All Done!", "green");
     }
 
-    private String getDiscTrackListResponseString(int row) {
-        MusicBrainzRequest request = new MusicBrainzRequest("tracks", idList.get(row));
+    /**
+     * Helper method to get the track list from the MusicBrainz API.
+     * @param row The row of the table. Used to look up the ID from the ID list.
+     * @param key The key to use for the request. (Release or CDStub)
+     * @return The response from the API.
+     */
+    private String getTrackListResponseString(int row, String key) {
+        MusicBrainzRequest request = new MusicBrainzRequest(key, idList.get(row));
         WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
         String response;
         try {
@@ -479,16 +433,44 @@ public class ProgramWindow {
         return response;
     }
 
-    private String getReleaseTrackListResponseString(int row) {
-        MusicBrainzRequest request = new MusicBrainzRequest("release", idList.get(row));
-        WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
-        String response;
-        try {
-            response = webRequest.sendRequest();
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        return response;
-    }
+    /**
+     * Helper method to create a track dialog. This is what the user uses to make the final labels
+     * from a search.
+     * @param title The title of the CD / Release.
+     * @param artist The artist of the CD / Release.
+     * @param trackCount The number of tracks on the CD / Release.
+     * @param date The date of the release. CDStubs typically do not have a date.
+     * @param model The table model to use for the track list.
+     */
+    private void createTrackDialog(String title, String artist, int trackCount, String date, DefaultTableModel model) {
+        // Set up panels
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        // Add labels to panel
+        panel.add(new JLabel("Title: " + title));
+        panel.add(new JLabel("Artist: " + artist));
+        panel.add(new JLabel("Track Count: " + trackCount));
+        if (date != null) {
+            panel.add(new JLabel("Date: " + date));
+        }
+
+        // Add label panel to main panel
+        mainPanel.add(panel, BorderLayout.NORTH);
+        // Add table to main panel
+        JTable trackTable = new JTable(model);
+        JScrollPane trackScrollPane = new JScrollPane(trackTable);
+        mainPanel.add(trackScrollPane, BorderLayout.CENTER);
+        // Add bottom (question) label to main panel
+        mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
+
+        // Show dialog
+        int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            System.out.println("ask her out");
+        } else if (result == JOptionPane.NO_OPTION) {
+            System.out.println("get rejected idiot");
+        }
+    }
 }
