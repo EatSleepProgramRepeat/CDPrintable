@@ -408,6 +408,8 @@ public class ProgramWindow {
     private void clickSearch(int row, int col, JTable table) {
         String typeOfTable = table.getColumnName(0);
         if (row < 0 || col < 0) return;
+        if (typeOfTable.equals("Artist Name")) {return;}
+
         if (col == 0 || col == 1) {
             setSearchStatus("Fetching Info...", "blue");
         }
