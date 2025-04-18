@@ -111,12 +111,15 @@ public class ProgramWindow {
         // CD Search Panel set up
         cdSearchPanel.setBorder(BorderFactory.createTitledBorder("Search"));
 
+        // Make the input field
         JTextField searchField = new JTextField(15);
 
+        // Search type combo box set up
         JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
 
         // Search button and event listener setup
         JButton searchButton = new JButton("Search");
+
         searchButton.addActionListener(_ -> {
             if (searchTypeComboBox.getSelectedItem() == null) {
                 return;
@@ -174,6 +177,9 @@ public class ProgramWindow {
                 resizeColumnWidths(searchTable);
             });
         });
+
+        // Set up enter key and text box
+        searchField.addActionListener(_ -> searchButton.doClick());
 
         cdSearchPanel.setLayout(new FlowLayout());
         cdSearchPanel.add(searchTypeComboBox);
