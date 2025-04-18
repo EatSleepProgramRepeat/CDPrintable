@@ -13,8 +13,6 @@ package com.CDPrintable;
 import com.CDPrintable.MusicBrainzResources.*;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -37,7 +35,11 @@ public class ProgramWindow {
      * Creates a new ProgramWindow and sets up the GUI.
      */
     public ProgramWindow() {
-        userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, "example@example.com");
+        String userAgentWebAddress = ConfigManager.getProperty("userAgentWebAddress");
+        if (userAgentWebAddress == null) {
+            userAgentWebAddress = "https://github.com/EatSleepProgramRepeat/CDPrintable";
+        }
+        userAgent = new UserAgent("CDPrintable/" + Constants.VERSION, userAgentWebAddress);
 
         JFrame frame = new JFrame("CD Printable v"+Constants.VERSION);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -114,7 +116,7 @@ public class ProgramWindow {
         // Make the input field
         JTextField searchField = new JTextField(15);
 
-        // Search type combo box set up
+        // Search type combo box setup
         JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
 
         // Search button and event listener setup
@@ -270,41 +272,18 @@ public class ProgramWindow {
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
         // Setup user agent text fields, labels, and document listeners
-        JLabel userAgentLabel = new JLabel("User Agent:");
+        JLabel userAgentLabel = new JLabel("User Agent (this dosen't save):");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
-        userAgentField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {}   // Not used
-        });
+        userAgentField.addActionListener(_ -> userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel));
 
         // Set up the user agent field with labels and document listener.
-        JLabel userAgentEmailLabel = new JLabel("User Agent Email:");
-        JTextField userAgentEmailField = new JTextField(15);
-        userAgentEmailField.setText(userAgent.getUserAgentEmail());
-        userAgentEmailField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                userAgent.setUserAgentEmail(userAgentEmailField.getText(), fullUserAgentLabel);
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {}   // Not used
+        JLabel userAgentWebAddressLabel = new JLabel("User Agent Web Address:");
+        JTextField userAgentWebAddressField = new JTextField(15);
+        userAgentWebAddressField.setText(userAgent.getUserAgentWebAddress());
+        userAgentWebAddressField.addActionListener(_ -> {
+            userAgent.setUserAgentWebAddress(userAgentWebAddressField.getText(), fullUserAgentLabel);
+            ConfigManager.setProperty("userAgentWebAddress", userAgentWebAddressField.getText());
         });
 
         fullUserAgentLabel = new JLabel(userAgent.toString());
@@ -334,11 +313,11 @@ public class ProgramWindow {
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        userAgentInputPanel.add(userAgentEmailLabel, gbc);
+        userAgentInputPanel.add(userAgentWebAddressLabel, gbc);
         fontPanel.add(fontSizeLabel, gbc);
 
         gbc.gridx = 1;
-        userAgentInputPanel.add(userAgentEmailField, gbc);
+        userAgentInputPanel.add(userAgentWebAddressField, gbc);
         fontPanel.add(fontSizeField, gbc);
 
         userAgentInputPanel.add(fullUserAgentLabel, gbc);
@@ -347,6 +326,7 @@ public class ProgramWindow {
         // Add panels to the UA main panel
         userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
         userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
+        userAgentPanel.add(new JLabel("Press enter to save settings anywhere."), BorderLayout.SOUTH);
 
         // Add subpanels to the main panel
         panel.add(userAgentPanel);

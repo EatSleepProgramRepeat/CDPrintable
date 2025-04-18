@@ -32,8 +32,6 @@ public class Constants {
         VERSION = tempVersion;
     }
 
-    public static final boolean USER_AGENT_EMAIL_CHANGED = false;
-
     public static final int MAX_THREADS = 4;
     public static final ThreadManager THREAD_MANAGER = new ThreadManager();
 }
