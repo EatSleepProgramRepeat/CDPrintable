@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 
 public class UserAgent {
     private String userAgent;
-    private String userAgentEmail;
+    private String userAgentWebAddress;
 
     /**
      * Constructor for UserAgent.
@@ -23,7 +23,7 @@ public class UserAgent {
      */
     public UserAgent(String userAgent, String userAgentEmail) {
         this.userAgent = userAgent;
-        this.userAgentEmail = userAgentEmail;
+        this.userAgentWebAddress = userAgentEmail;
     }
 
     /**
@@ -32,7 +32,7 @@ public class UserAgent {
      */
     @Override
     public String toString() {
-        return userAgent + " (" + userAgentEmail + ")";
+        return userAgent + " (" + userAgentWebAddress + ")";
     }
 
     /**
@@ -44,11 +44,11 @@ public class UserAgent {
     }
 
     /**
-     * Gets the user agent email.
-     * @return The user agent email.
+     * Gets the user agent web link
+     * @return The user agent web link.
      */
-    public String getUserAgentEmail() {
-        return userAgentEmail;
+    public String getUserAgentWebAddress() {
+        return userAgentWebAddress;
     }
 
     /**
@@ -70,20 +70,11 @@ public class UserAgent {
     }
 
     /**
-     * Sets the user agent email.
-     * @param userAgentEmail The user agent email to set.
+     * Sets the user agent web address and does some tomfoolery IDK man.
+     * @param address The user agent web address to set.
      */
-    public void setUserAgentEmail(String userAgentEmail) {
-        this.userAgentEmail = userAgentEmail;
-    }
-
-    /**
-     * Sets the user agent email and updates the full user agent label.
-     * @param userAgentEmail The user agent email to set.
-     * @param fullUserAgentLabel The label to update.
-     */
-    public void setUserAgentEmail(String userAgentEmail, JLabel fullUserAgentLabel) {
-        this.userAgentEmail = userAgentEmail;
+    public void setUserAgentWebAddress(String address, JLabel fullUserAgentLabel) {
+        this.userAgentWebAddress = address;
         fullUserAgentLabel.setText(toString());
     }
 }

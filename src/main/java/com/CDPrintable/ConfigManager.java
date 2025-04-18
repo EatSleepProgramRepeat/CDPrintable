@@ -10,5 +10,89 @@
 
 package com.CDPrintable;
 
+import com.google.gson.*;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class ConfigManager {
+    private final static String configFilePath;
+    private final static File file;
+    private static String json;
+
+    static {
+        configFilePath = System.getProperty("user.home") + "/CDPrintable/config.json";
+        file = new File(configFilePath);
+        File parentDir = file.getParentFile();
+        if (!parentDir.exists()) {
+            if (!parentDir.mkdirs()) {
+                JOptionPane.showMessageDialog(null, "Couldn't create the parent directory", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        try {
+            if (file.createNewFile()) {
+                JOptionPane.showMessageDialog(null, "Config file created. Welcome to CDPrintable!", "Welcome", JOptionPane.INFORMATION_MESSAGE);
+                Files.writeString(file.toPath(), "{\"userAgentWebAddress\": \"https://github.com/EatSleepProgramRepeat/CDPrintable\"}");
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "oopsie poopsies", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Reads the config file and returns the JSON string.
+     * @return JSON string from the config file.
+     */
+    public static String getProperty(String key) {
+        readConfigFile();
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            return jsonObject.has(key) ? jsonObject.get(key).getAsString() : null;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading property from config file!", "Error", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+
+    /**
+     * Sets a property in the config file.
+     * @param key The key to set.
+     * @param value The value to set.
+     */
+    public static void setProperty(String key, String value) {
+        readConfigFile();
+        JsonElement jsonElement = JsonParser.parseString(json);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        jsonObject.addProperty(key, value);
+        writeConfigFile(jsonObject);
+    }
+
+    /**
+     * Helper method to read a JSON file.
+     */
+    private static void readConfigFile() {
+        try {
+            json = Files.readString(file.toPath());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Could not read config file!", "Error", JOptionPane.ERROR_MESSAGE);
+            json = "{}";
+        }
+    }
+
+    /**
+     * Helper method to write a JSON file.
+     */
+    public static void writeConfigFile(JsonObject jsonObject) {
+        Path filePath = Path.of(configFilePath);
+
+        try {
+            Files.writeString(filePath, jsonObject.toString());
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Could not write to JSON config file!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }
