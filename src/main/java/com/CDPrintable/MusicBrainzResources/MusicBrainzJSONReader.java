@@ -266,6 +266,7 @@ public class MusicBrainzJSONReader {
             JOptionPane.showMessageDialog(null, "No media found in JSON.", "Error", JOptionPane.ERROR_MESSAGE);
             return new MusicBrainzTrack[0];
         }
+        boolean vinylWarningShown = false, tnWarningShown = false;
         for (JsonElement mediaElement : mediaArray) {
             JsonObject mediaObject = mediaElement.getAsJsonObject(); // Cast each element to JsonObject
             JsonArray trackArray = mediaObject.getAsJsonArray("tracks");
@@ -274,9 +275,29 @@ public class MusicBrainzJSONReader {
                 String title = jsonHasAndIsNotNull(trackObject, "title") ? trackObject.get("title").getAsString() : null;
                 int length = jsonHasAndIsNotNull(trackObject, "length") ? trackObject.get("length").getAsInt() : -1;
                 int trackNumber = -1;
+                // tn represents track number
 
                 if (trackObject.has("number")) {
-                    trackNumber = trackObject.get("number").getAsInt();
+                    try {
+                        // I guess that some vinyl discs have track number A1 which nukes this program.
+                        trackNumber = trackObject.get("number").getAsInt();
+                    } catch (NumberFormatException e) {
+                        if (!vinylWarningShown) {
+                            JOptionPane.showMessageDialog(null, "This is most likely a vinyl release. Track numbers are different on vinyl, but this release will still be processed. \n Things might get funky from here :/");
+                            vinylWarningShown = true;
+                        }
+                        // Try to see if position exists instead
+                        if (trackObject.has("position")) {
+                            try {
+                                trackNumber = trackObject.get("position").getAsInt();
+                            } catch (NumberFormatException e2) {
+                                if (!tnWarningShown) {
+                                    JOptionPane.showMessageDialog(null, "This release dosen't have correctly formatted track numbers. \n It will still be processed, but things might get strange from here.", "Warning", JOptionPane.WARNING_MESSAGE);
+                                    tnWarningShown = true;
+                                }
+                            }
+                        }
+                    }
                 } else if (trackObject.has("position")) {
                     trackNumber = trackObject.get("position").getAsInt();
                 }
