@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Objects;
 
 public class ProgramWindow {
     private final UserAgent userAgent;
@@ -133,7 +132,7 @@ public class ProgramWindow {
             clearIdList();
             String finalSelectedItem = selectedItem;
             Constants.THREAD_MANAGER.submit(() -> {
-                MusicBrainzJSONReader reader = sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), searchField.getText());
+                MusicBrainzJSONReader reader = new MusicBrainzJSONReader(sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), searchField.getText(), false));
                 switch (finalSelectedItem) {
                     case "CDStub" -> {
                         // Get CDStubs and set the table model
@@ -181,28 +180,31 @@ public class ProgramWindow {
     }
 
     /**
-     * Sends a request to the MusicBrainz API.
-     * @param queryType The query type to send. E.g. "cdstub", "release", etc.
-     * @param query The query to send.
-     * @return a MusicBrainzJSONReader object with the response JSON already in it.
+     * Sends a request to the MusicBrainz API and returns the response as a string.
+     * @param queryType The type of query (e.g., "artist", "cdstub", "tracks", "release").
+     * @param query The query string.
+     * @param isTrackList Whether to use the track list URL builder.
+     * @return The response from the API as a string.
      */
-    private MusicBrainzJSONReader sendRequest(String queryType, String query) {
+    private String sendRequest(String queryType, String query, boolean isTrackList) {
         MusicBrainzRequest request = new MusicBrainzRequest(queryType, query);
-        WebRequest webRequest = new WebRequest(request, userAgent);
+        String url = isTrackList ? request.buildTrackListURL() : request.buildRequestURL();
+        WebRequest webRequest = new WebRequest(url, userAgent);
 
-        String response = null;
         try {
-            response = webRequest.sendRequest();
-        } catch (Exception ex) {
+            String response = webRequest.sendRequest();
+            if (response == null || response.isEmpty()) {
+                throw new IOException("Empty or null response from the server.");
+            }
+            return response;
+        } catch (IOException | URISyntaxException e) {
             JOptionPane.showMessageDialog(null, """
-                    There was a fatal error when sending the request. Please try again or submit an issue on GitHub.
-                    Here are some things to try:
-                    • Check your internet connection.
-                    • Remove any special characters from your query.""", "CDPrintable Severe Error", JOptionPane.ERROR_MESSAGE);
+                There was a severe problem when sending the web request.
+                Please check your internet connection or query and try again.""",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            setSearchStatus("Error", "red");
+            throw new RuntimeException(e);
         }
-
-        return new MusicBrainzJSONReader(Objects.requireNonNullElse(response, ""));
-
     }
 
     /**
@@ -210,26 +212,31 @@ public class ProgramWindow {
      * @param model The model to get.
      */
     private DefaultTableModel getTableModel(String model) {
+        String[][] data = {{"", "", "", "", "", "", "", "", ""}};
         switch (model) {
             case "CDStub" -> {
-                String[] columnNames = {"Disc Name", "Artist", "Track Count"};
-                String[][] data = {{"", "", ""}};
-                return new DefaultTableModel(data, columnNames);
+                return createTableModel(new String[]{"Disc Name", "Artist", "Track Count"}, data);
             }
             case "Artist" -> {
-                String[] columnNames = {"Artist Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country"};
-                String[][] data = {{"", "", "", "", "", "", ""}};
-                return new DefaultTableModel(data, columnNames);
+                return createTableModel(new String[]{"Artist Name", "Date Organised", "Birthdate", "Sort Name", "Gender", "Type", "Disambiguation", "Life Span", "Country"}, data);
             }
             case "Release" -> {
-                String[] columnNames = {"Release Name", "Artist", "Track Count", "Date"};
-                String[][] data = {{"", "", ""}};
-                return new DefaultTableModel(data, columnNames);
+                return createTableModel(new String[]{"Release Name", "Artist", "Track Count", "Date"}, data);
             }
             default -> {
-                return new DefaultTableModel(new String [][] {{}}, new String[] {});
+                return createTableModel(new String[]{}, new String[][]{{}});
             }
         }
+    }
+
+    /**
+     * Little helper method to create table models from Strings
+     * @param columnNames The column names.
+     * @param data The data for the table.
+     * @return A DefaultTableModel with the data and column names.
+     */
+    private DefaultTableModel createTableModel(String[] columnNames, String[][] data) {
+        return new DefaultTableModel(data, columnNames);
     }
 
     /**
@@ -384,57 +391,34 @@ public class ProgramWindow {
      */
     private void clickSearch(int row, int col, JTable table) {
         String typeOfTable = table.getColumnName(0);
-        System.out.println("Clicked at: " + row + ", " + col);
-        if (row < 0 || col < 0) {return;}
-
-        setSearchStatus("Fetching Tracks...", "blue");
-        String response;
-        DefaultTableModel model;
-        String title = "", artist = "";
-        int trackCount = 0;
-        if (Objects.equals(typeOfTable, "Disc Name") || Objects.equals(typeOfTable, "Release Name")) {
-            title = table.getValueAt(row, 0).toString();
-            artist = table.getValueAt(row, 1).toString();
-            trackCount = Integer.parseInt(table.getValueAt(row, 2).toString());
+        if (row < 0 || col < 0) return;
+        if (col == 0 || col == 1) {
+            setSearchStatus("Fetching Info...", "blue");
         }
 
-        switch (typeOfTable) {
-            case "Disc Name" -> {
+        Constants.THREAD_MANAGER.submit(() -> {
+            String response;
+            DefaultTableModel model;
+
+            try {
                 if (col == 0) {
-                    response = getTrackListResponseString(row, "tracks");
-                    model = new MusicBrainzJSONReader(response).getTracksAsTableModel(new MusicBrainzJSONReader(response).getTracks());
-                    createTrackDialog(title, artist, trackCount, null, model);
-                }
-            }
-            case "Release Name" -> {
-                if (col == 0) {
-                    response = getTrackListResponseString(row, "release");
+                    response = sendRequest(typeOfTable.equals("Disc Name") ? "tracks" : "release", idList.get(row), typeOfTable.equals("Disc Name"));
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-                    model = reader.getTracksAsTableModel(reader.getReleaseTracks());
-                    String date = table.getValueAt(row, 3).toString();
-                    createTrackDialog(title, artist, trackCount, date, model);
+                    model = reader.getTracksAsTableModel(typeOfTable.equals("Disc Name") ? reader.getTracks() : reader.getReleaseTracks());
+                    String date = typeOfTable.equals("Release Name") ? table.getValueAt(row, 3).toString() : null;
+                    createTrackDialog(table.getValueAt(row, 0).toString(), table.getValueAt(row, 1).toString(),
+                            Integer.parseInt(table.getValueAt(row, 2).toString()), date, model);
+                } else if (col == 1) {
+                    response = sendRequest("artist", table.getValueAt(row, 1).toString(), false);
+                    MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
+                    model = reader.getArtistsAsTableModel(reader.getArtists());
+                    createArtistDialog(model);
                 }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "An error occurred while processing the request.", "Error", JOptionPane.ERROR_MESSAGE);
+                setSearchStatus("Error", "red");
             }
-        }
-        setSearchStatus("All Done!", "green");
-    }
-
-    /**
-     * Helper method to get the track list from the MusicBrainz API.
-     * @param row The row of the table. Used to look up the ID from the ID list.
-     * @param key The key to use for the request. (Release or CDStub)
-     * @return The response from the API.
-     */
-    private String getTrackListResponseString(int row, String key) {
-        MusicBrainzRequest request = new MusicBrainzRequest(key, idList.get(row));
-        WebRequest webRequest = new WebRequest(request.buildTrackListURL(), userAgent);
-        String response;
-        try {
-            response = webRequest.sendRequest();
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        return response;
+        });
     }
 
     /**
@@ -468,6 +452,7 @@ public class ProgramWindow {
         mainPanel.add(trackScrollPane, BorderLayout.CENTER);
         // Add bottom (question) label to main panel
         mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
+        setSearchStatus("All done!", "green");
 
         // Show dialog
         int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
@@ -476,5 +461,23 @@ public class ProgramWindow {
         } else if (result == JOptionPane.NO_OPTION) {
             System.out.println("get rejected idiot");
         }
+    }
+
+    private void createArtistDialog(DefaultTableModel model) {
+        JScrollPane artistScrollPane = new JScrollPane();
+        JTable artistTable = new JTable(model);
+        resizeColumnWidths(artistTable);
+        artistScrollPane.setViewportView(artistTable);
+        JOptionPane pane = new JOptionPane(
+                artistScrollPane,
+                JOptionPane.INFORMATION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION
+        );
+        JDialog dialog = pane.createDialog("Artists");
+        setSearchStatus("All done!", "green");
+
+        dialog.setPreferredSize(artistTable.getPreferredSize());
+        dialog.pack();
+        dialog.setVisible(true);
     }
 }
