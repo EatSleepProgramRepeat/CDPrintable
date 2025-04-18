@@ -129,7 +129,7 @@ public class ProgramWindow {
                 selectedItem = "";
             }
 
-            setSearchStatus("Preforming search...", "blue");
+            setSearchStatus("Performing search...", "blue");
             clearIdList();
             String finalSelectedItem = selectedItem;
             Constants.THREAD_MANAGER.submit(() -> {
@@ -138,7 +138,6 @@ public class ProgramWindow {
                 switch (finalSelectedItem) {
                     case "CDStub" -> {
                         columnsToHighlight = new int[]{0, 1};
-                        // Get CDStubs and set the table model
                         MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
                         for (MusicBrainzCDStub cdStub : cdStubs) {
                             addId(cdStub.getId());
@@ -147,7 +146,6 @@ public class ProgramWindow {
                         searchTable.setModel(reader.getCDStubsAsTableModel(cdStubs));
                     }
                     case "Artist" -> {
-                        // Get Artists and set the table model
                         MusicBrainzArtist[] artists = reader.getArtists();
                         for (MusicBrainzArtist artist : artists) {
                             addId(artist.getId());
@@ -157,7 +155,6 @@ public class ProgramWindow {
                     }
                     case "Release" -> {
                         columnsToHighlight = new int[]{0, 1};
-                        // Get Releases and set the table model
                         MusicBrainzRelease[] releases = reader.getReleases();
                         for (MusicBrainzRelease release : releases) {
                             addId(release.getId());
@@ -167,13 +164,15 @@ public class ProgramWindow {
                     }
                     default -> JOptionPane.showMessageDialog(panel, "Please select a search type.");
                 }
+
+                // Reapply the custom renderer after setting the new model
                 if (columnsToHighlight != null) {
                     for (int column : columnsToHighlight) {
                         searchTable.getColumnModel().getColumn(column).setCellRenderer(new LightBlueColumnRenderer());
                     }
                 }
+                resizeColumnWidths(searchTable);
             });
-            resizeColumnWidths(searchTable);
         });
 
         cdSearchPanel.setLayout(new FlowLayout());
@@ -343,7 +342,7 @@ public class ProgramWindow {
         userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
         userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
 
-        // Add sub-panels to the main panel
+        // Add subpanels to the main panel
         panel.add(userAgentPanel);
         panel.add(fontPanel);
 
@@ -455,13 +454,13 @@ public class ProgramWindow {
             panel.add(new JLabel("Date: " + date));
         }
 
-        // Add label panel to main panel
+        // Add the label panel to the main panel
         mainPanel.add(panel, BorderLayout.NORTH);
-        // Add table to main panel
+        // Add table to the main panel
         JTable trackTable = new JTable(model);
         JScrollPane trackScrollPane = new JScrollPane(trackTable);
         mainPanel.add(trackScrollPane, BorderLayout.CENTER);
-        // Add bottom (question) label to main panel
+        // Add bottom (question) label to the main panel
         mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
         setSearchStatus("All done!", "green");
 
@@ -470,7 +469,7 @@ public class ProgramWindow {
         if (result == JOptionPane.YES_OPTION) {
             System.out.println("ask her out");
         } else if (result == JOptionPane.NO_OPTION) {
-            System.out.println("get rejected idiot");
+            System.out.println("she rejected you...");
         }
     }
 
