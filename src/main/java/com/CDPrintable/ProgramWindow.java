@@ -15,6 +15,7 @@ import com.CDPrintable.MusicBrainzResources.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
@@ -132,9 +133,11 @@ public class ProgramWindow {
             clearIdList();
             String finalSelectedItem = selectedItem;
             Constants.THREAD_MANAGER.submit(() -> {
+                int[] columnsToHighlight = null;
                 MusicBrainzJSONReader reader = new MusicBrainzJSONReader(sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), searchField.getText(), false));
                 switch (finalSelectedItem) {
                     case "CDStub" -> {
+                        columnsToHighlight = new int[]{0, 1};
                         // Get CDStubs and set the table model
                         MusicBrainzCDStub[] cdStubs = reader.getCDStubs();
                         for (MusicBrainzCDStub cdStub : cdStubs) {
@@ -153,6 +156,7 @@ public class ProgramWindow {
                         searchTable.setModel(reader.getArtistsAsTableModel(artists));
                     }
                     case "Release" -> {
+                        columnsToHighlight = new int[]{0, 1};
                         // Get Releases and set the table model
                         MusicBrainzRelease[] releases = reader.getReleases();
                         for (MusicBrainzRelease release : releases) {
@@ -163,8 +167,12 @@ public class ProgramWindow {
                     }
                     default -> JOptionPane.showMessageDialog(panel, "Please select a search type.");
                 }
+                if (columnsToHighlight != null) {
+                    for (int column : columnsToHighlight) {
+                        searchTable.getColumnModel().getColumn(column).setCellRenderer(new LightBlueColumnRenderer());
+                    }
+                }
             });
-
             resizeColumnWidths(searchTable);
         });
 
@@ -175,6 +183,9 @@ public class ProgramWindow {
 
         // Add the CD Search panel to the main panel
         panel.add(cdSearchPanel, BorderLayout.SOUTH);
+
+        // Add a label that informs the user about ClickSearch.
+        panel.add(new JLabel("Click a row in a column that is highlighted in light blue to search or add something to the final label."), BorderLayout.NORTH);
 
         return panel;
     }
@@ -402,7 +413,7 @@ public class ProgramWindow {
 
             try {
                 if (col == 0) {
-                    response = sendRequest(typeOfTable.equals("Disc Name") ? "tracks" : "release", idList.get(row), typeOfTable.equals("Disc Name"));
+                    response = sendRequest(typeOfTable.equals("Disc Name") ? "tracks" : "release", idList.get(row), true);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
                     model = reader.getTracksAsTableModel(typeOfTable.equals("Disc Name") ? reader.getTracks() : reader.getReleaseTracks());
                     String date = typeOfTable.equals("Release Name") ? table.getValueAt(row, 3).toString() : null;
@@ -415,7 +426,7 @@ public class ProgramWindow {
                     createArtistDialog(model);
                 }
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "An error occurred while processing the request.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "An error occurred while processing the request. More info: " + e, "Error", JOptionPane.ERROR_MESSAGE);
                 setSearchStatus("Error", "red");
             }
         });
@@ -479,5 +490,18 @@ public class ProgramWindow {
         dialog.setPreferredSize(artistTable.getPreferredSize());
         dialog.pack();
         dialog.setVisible(true);
+    }
+
+    /**
+     * A custom table cell renderer that sets the background color of the cell to light blue.
+     * Used for columns that support ClickSearch.
+     */
+    static class LightBlueColumnRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            cell.setBackground(new Color(173, 216, 230)); // Light blue color
+            return cell;
+        }
     }
 }
