@@ -262,6 +262,10 @@ public class MusicBrainzJSONReader {
         List<MusicBrainzTrack> trackList = new ArrayList<>();
 
         JsonArray mediaArray = json.getAsJsonArray("media");
+        if (mediaArray == null) {
+            JOptionPane.showMessageDialog(null, "No media found in JSON.", "Error", JOptionPane.ERROR_MESSAGE);
+            return new MusicBrainzTrack[0];
+        }
         for (JsonElement mediaElement : mediaArray) {
             JsonObject mediaObject = mediaElement.getAsJsonObject(); // Cast each element to JsonObject
             JsonArray trackArray = mediaObject.getAsJsonArray("tracks");
