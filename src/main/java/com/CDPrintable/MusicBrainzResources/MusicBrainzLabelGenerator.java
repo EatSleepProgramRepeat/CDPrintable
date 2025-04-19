@@ -76,63 +76,74 @@ public class MusicBrainzLabelGenerator implements Printable {
 
     @Override
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-        if (pageIndex > 0) {
-            return NO_SUCH_PAGE;
-        }
-
         Graphics2D g2d = (Graphics2D) graphics;
         g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
         g2d.setColor(Color.BLACK);
 
+        // Set font and metrics
         Font font = new Font("Arial", Font.PLAIN, fontSize);
         g2d.setFont(font);
         FontMetrics fontMetrics = g2d.getFontMetrics();
 
-        int x = 0;
-        int y = 0;
-        int labelStartY;
+        // Determine how many lines a sheet of paper can hold
+        double paperMaxLines = Math.floor(((pageHeight * 72) - marginTop - marginBottom) / fontSize);
+        System.out.println("paperMaxLines=" + paperMaxLines);
+
+        // Find label max height in lines
+        double labelLineMaxHeight = Math.floor((double) LABEL_MAX_HEIGHT / fontSize);
+        System.out.println("labelLineMaxHeight=" + labelLineMaxHeight);
+
+        // Make an array of the lines for the releases
+        ArrayList<String> lines = new ArrayList<>();
         for (MusicBrainzFinalizedRelease release : finalizedReleaseList) {
-            labelStartY = y;
-            // Draw title
-            String title = release.getTitle();
-            g2d.drawString(title, x, y);
-            y += fontMetrics.getHeight();
-
-            // Draw artist
-            String artist = release.getArtist();
-            g2d.drawString(artist, x, y);
-            y += fontMetrics.getHeight();
-
-            // Draw tracks
-            StringBuilder sb = new StringBuilder();
-            StringBuilder trackLineBuilder = new StringBuilder();
+            lines.add(release.getTitle());
+            lines.add(release.getArtist());
+            StringBuilder finalLine = new StringBuilder();
+            StringBuilder lineBuilder = new StringBuilder();
             for (MusicBrainzTrack track : release.getTracks()) {
-                String trackText = track.getTrackNumber() + ". " + track.getTitle();
-                if (fontMetrics.stringWidth(trackLineBuilder.toString()) + fontMetrics.stringWidth(trackText) > LABEL_WIDTH) {
-                    sb.append(trackLineBuilder.toString().trim()).append("\n");
-                    trackLineBuilder.setLength(0);
+                String line = track.getTrackNumber() + ". " + track.getTitle() + " ";
+                if (fontMetrics.stringWidth(line + lineBuilder) > LABEL_WIDTH) {
+                    lineBuilder.append("\n");
+                    lines.add(lineBuilder.toString());
+                    lineBuilder.delete(0, lineBuilder.length());
                 }
-                trackLineBuilder.append(trackText).append("  ");
+                lineBuilder.append(line);
             }
-            sb.append(trackLineBuilder.toString().trim());
+            lines.add(lineBuilder.toString());
+            lines.add("");
+            System.out.println(lines.toString());
+        }
 
-            String[] lines = sb.toString().split("\n");
-//            if (lines.length * fontMetrics.getHeight() > )
-            for (String line : lines) {
-                if (y + fontMetrics.getHeight() > LABEL_MAX_HEIGHT + labelStartY) {
-                    break; // Stop if the text exceeds the label height
-                }
-                System.out.println("Drawing line: " + line);
-                g2d.drawString(line, x, y);
-                y += fontMetrics.getHeight();
+        // Get empty lines to find where releases start/end
+        ArrayList<Integer> emptyLines = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).isEmpty()) {
+                emptyLines.add(i);
             }
+        }
 
-            // Add spacing between releases
+        System.out.println("emptyLines=" + emptyLines);
+
+        int startLine = (int) (pageIndex * paperMaxLines);
+        double endLine = Math.min(startLine + paperMaxLines, lines.size());
+
+        if (startLine > lines.size()) {
+            return NO_SUCH_PAGE;
+        }
+
+        int y = 0;
+
+        // Draw. Every. Dang. Line
+        // ALERT! The code below stops you from pulling girls. Wait, that's the whole codebase!
+        for (int i = startLine; i < endLine; i++) {
+            String line = lines.get(i);
+            g2d.drawString(line, 0, y + fontMetrics.getAscent());
             y += fontMetrics.getHeight();
         }
 
         return PAGE_EXISTS;
     }
+
 
     public void addRelease(MusicBrainzFinalizedRelease release) {
         finalizedReleaseList.add(release);
