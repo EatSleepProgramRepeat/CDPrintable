@@ -286,13 +286,13 @@ public class MusicBrainzJSONReader {
                             JOptionPane.showMessageDialog(null, "This is most likely a vinyl release. Track numbers are different on vinyl, but this release will still be processed. \n Things might get funky from here :/");
                             vinylWarningShown = true;
                         }
-                        // Try to see if position exists instead
+                        // Try to see if the position exists instead
                         if (trackObject.has("position")) {
                             try {
                                 trackNumber = trackObject.get("position").getAsInt();
                             } catch (NumberFormatException e2) {
                                 if (!tnWarningShown) {
-                                    JOptionPane.showMessageDialog(null, "This release dosen't have correctly formatted track numbers. \n It will still be processed, but things might get strange from here.", "Warning", JOptionPane.WARNING_MESSAGE);
+                                    JOptionPane.showMessageDialog(null, "This release doesn't have correctly formatted track numbers. \n It will still be processed, but things might get strange from here.", "Warning", JOptionPane.WARNING_MESSAGE);
                                     tnWarningShown = true;
                                 }
                             }

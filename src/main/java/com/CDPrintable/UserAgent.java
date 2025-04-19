@@ -36,7 +36,8 @@ public class UserAgent {
     }
 
     /**
-     * Gets the user agent string. This is the string towards the beginning of the full user agent (e.g. CDPrintable/1.0.0).
+     * Gets the user agent string.
+     * This is the string towards the beginning of the full user agent (e.g., CDPrintable/1.0.0).
      * @return The user agent string.
      */
     public String getUserAgent() {

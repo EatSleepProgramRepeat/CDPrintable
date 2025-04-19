@@ -273,7 +273,7 @@ public class ProgramWindow {
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
         // Setup user agent text fields, labels, and document listeners
-        JLabel userAgentLabel = new JLabel("User Agent (this dosen't save):");
+        JLabel userAgentLabel = new JLabel("User Agent (this doesn't save):");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
         userAgentField.addActionListener(_ -> userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel));
@@ -436,7 +436,7 @@ public class ProgramWindow {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Add labels to panel
+        // Add labels to the panel
         panel.add(new JLabel("Title: " + title));
         panel.add(new JLabel("Artist: " + artist));
         panel.add(new JLabel("Track Count: " + trackCount));
@@ -446,11 +446,11 @@ public class ProgramWindow {
 
         // Add the label panel to the main panel
         mainPanel.add(panel, BorderLayout.NORTH);
-        // Add table to the main panel
+        // Add the table to the main panel
         JTable trackTable = new JTable(model);
         JScrollPane trackScrollPane = new JScrollPane(trackTable);
         mainPanel.add(trackScrollPane, BorderLayout.CENTER);
-        // Add bottom (question) label to the main panel
+        // Add the bottom (question) label to the main panel
         mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
         setSearchStatus("All done!", "green");
 
