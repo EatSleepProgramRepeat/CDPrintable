@@ -10,6 +10,8 @@
 
 package com.CDPrintable.MusicBrainzResources;
 
+import com.CDPrintable.ConfigManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -18,37 +20,30 @@ import java.util.ArrayList;
 
 public class MusicBrainzLabelGenerator implements Printable {
     private final ArrayList<MusicBrainzFinalizedRelease> finalizedReleaseList;
-    public int LABEL_WIDTH;
-    public int LABEL_MAX_HEIGHT;
+    public double labelWidth;
+    public double labelMaxHeight;
     public int dpiX;
     public int dpiY;
     public int marginTop;
     public int marginBottom;
     public int marginLeft;
     public int marginRight;
-    private int fontSize = 10;
-    public double pageWidth = 8.5;
-    public double pageHeight = 11;
-
-    public int getFontSize() {
-        return fontSize;
-    }
-
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
-    }
+    private double fontSize;
+    public double pageWidth;
+    public double pageHeight;
+    public String fontName;
 
     public MusicBrainzLabelGenerator() {
         double[] dpi = getDPI();
         this.dpiX = (int) dpi[0];
         this.dpiY = (int) dpi[1];
 
-        this.LABEL_WIDTH = 4 * dpiX; // Example: 1 inch width
-        this.LABEL_MAX_HEIGHT = 2 * dpiY; // Example: 1 inch height
+        this.labelWidth = ConfigManager.getDoubleProperty("labelWidth", 4) * dpiX;
+        this.labelMaxHeight = ConfigManager.getDoubleProperty("labelMaxHeight", 2) * dpiY;
 
         finalizedReleaseList = new ArrayList<>();
         System.out.println("DPI: dpiX=" + dpiX + ", dpiY=" + dpiY);
-        System.out.println("Label dimensions: " + LABEL_WIDTH + "x" + LABEL_MAX_HEIGHT);
+        System.out.println("Label dimensions: " + labelWidth + "x" + labelMaxHeight);
 
         double[] margins = getMargins();
         this.marginTop = (int) margins[0];
@@ -56,22 +51,12 @@ public class MusicBrainzLabelGenerator implements Printable {
         this.marginLeft = (int) margins[2];
         this.marginRight = (int) margins[3];
         System.out.println("Margins: " + margins[0] + "x" + margins[1] + "x" + margins[2] + "x" + margins[3]);
-    }
 
-    public int getLabelWidth() {
-        return LABEL_WIDTH;
-    }
+        this.fontSize = ConfigManager.getDoubleProperty("fontSize", 10);
+        this.pageWidth = ConfigManager.getDoubleProperty("pageWidth", 8.5);
+        this.pageHeight = ConfigManager.getDoubleProperty("pageHeight", 11);
+        this.fontName = ConfigManager.getProperty("fontName", "Arial");
 
-    public void setLabelWidth(int labelWidth) {
-        LABEL_WIDTH = labelWidth * dpiX;
-    }
-
-    public int getLabelMaxHeight() {
-        return LABEL_MAX_HEIGHT;
-    }
-
-    public void setLabelMaxHeight(int labelMaxHeight) {
-        LABEL_MAX_HEIGHT = labelMaxHeight * dpiY;
     }
 
     @Override
@@ -80,7 +65,7 @@ public class MusicBrainzLabelGenerator implements Printable {
         g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
         g2d.setColor(Color.BLACK);
 
-        Font font = new Font("Arial", Font.PLAIN, fontSize);
+        Font font = new Font(fontName, Font.PLAIN, (int) fontSize);
         g2d.setFont(font);
         FontMetrics fontMetrics = g2d.getFontMetrics();
 
@@ -98,11 +83,11 @@ public class MusicBrainzLabelGenerator implements Printable {
             for (MusicBrainzTrack track : release.getTracks()) {
                 String line = track.getTrackNumber() + ". " + track.getTitle() + " ";
                 // Split stuff up IF the line gets too long
-                if (fontMetrics.stringWidth(lineBuilder + line) > LABEL_WIDTH) {
+                if (fontMetrics.stringWidth(lineBuilder + line) > labelWidth) {
                     releaseLines.add(lineBuilder.toString());
                     lineBuilder.delete(0, lineBuilder.length());
                 }
-                if (releaseLines.size() * fontMetrics.getHeight() >= LABEL_MAX_HEIGHT) {break;}
+                if (releaseLines.size() * fontMetrics.getHeight() >= labelMaxHeight) {break;}
                 lineBuilder.append(line);
             }
             if (!lineBuilder.isEmpty()) {
@@ -259,4 +244,51 @@ public class MusicBrainzLabelGenerator implements Printable {
         }
     }
 
+    public double getLabelWidth() {
+        return labelWidth;
+    }
+
+    public void setLabelWidth(double labelWidth) {
+        this.labelWidth = labelWidth;
+    }
+
+    public double getLabelMaxHeight() {
+        return labelMaxHeight;
+    }
+
+    public void setLabelMaxHeight(double labelMaxHeight) {
+        this.labelMaxHeight = labelMaxHeight;
+    }
+
+    public double getFontSize() {
+        return fontSize;
+    }
+
+    public void setFontSize(double fontSize) {
+        this.fontSize = fontSize;
+    }
+
+    public double getPageWidth() {
+        return pageWidth;
+    }
+
+    public void setPageWidth(double pageWidth) {
+        this.pageWidth = pageWidth;
+    }
+
+    public double getPageHeight() {
+        return pageHeight;
+    }
+
+    public void setPageHeight(double pageHeight) {
+        this.pageHeight = pageHeight;
+    }
+
+    public String getFontName() {
+        return fontName;
+    }
+
+    public void setFontName(String fontName) {
+        this.fontName = fontName;
+    }
 }

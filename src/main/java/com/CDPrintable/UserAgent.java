@@ -10,7 +10,7 @@
 
 package com.CDPrintable;
 
-import javax.swing.JLabel;
+import javax.swing.*;
 
 public class UserAgent {
     private String userAgent;
@@ -71,11 +71,31 @@ public class UserAgent {
     }
 
     /**
+     * Another random method for setting the user agent.
+     */
+    public void setUserAgent(String userAgent, boolean b) {
+        this.userAgent = userAgent;
+        if (b) {
+            JOptionPane.showMessageDialog(null, "Here's your new agent: " + this, "New User Agent", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    /**
      * Sets the user agent web address and does some tomfoolery IDK man.
      * @param address The user agent web address to set.
      */
     public void setUserAgentWebAddress(String address, JLabel fullUserAgentLabel) {
         this.userAgentWebAddress = address;
         fullUserAgentLabel.setText(toString());
+    }
+
+    /**
+     * Another random method for setting user agent web address.
+     */
+    public void setUserAgentWebAddress(String address, boolean b) {
+        this.userAgentWebAddress = address;
+        if (b) {
+            JOptionPane.showMessageDialog(null, "Here's your new agent: " + this, "New User Agent", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 }
