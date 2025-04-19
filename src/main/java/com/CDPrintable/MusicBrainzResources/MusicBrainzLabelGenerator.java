@@ -88,7 +88,6 @@ public class MusicBrainzLabelGenerator implements Printable {
         double maxLinesPerPage = Math.floor(((pageHeight * 72) - marginTop - marginBottom) / lineHeight);
 
         ArrayList<ArrayList<String>> releasesAsLines = new ArrayList<>();
-        ArrayList<String> currentReleaseLines = new ArrayList<>();
 
         for (MusicBrainzFinalizedRelease release : finalizedReleaseList) {
             ArrayList<String> releaseLines = new ArrayList<>();
@@ -98,10 +97,12 @@ public class MusicBrainzLabelGenerator implements Printable {
             StringBuilder lineBuilder = new StringBuilder();
             for (MusicBrainzTrack track : release.getTracks()) {
                 String line = track.getTrackNumber() + ". " + track.getTitle() + " ";
+                // Split stuff up IF the line gets too long
                 if (fontMetrics.stringWidth(lineBuilder + line) > LABEL_WIDTH) {
                     releaseLines.add(lineBuilder.toString());
-                    lineBuilder = new StringBuilder();
+                    lineBuilder.delete(0, lineBuilder.length());
                 }
+                if (releaseLines.size() * fontMetrics.getHeight() >= LABEL_MAX_HEIGHT) {break;}
                 lineBuilder.append(line);
             }
             if (!lineBuilder.isEmpty()) {
