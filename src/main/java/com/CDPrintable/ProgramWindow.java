@@ -458,7 +458,7 @@ public class ProgramWindow {
         int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
             labelGenerator.addRelease(new MusicBrainzFinalizedRelease(title, artist, tracks));
-            labelGenerator.printLabel();
+            labelGenerator.displayPagesAsImages();
         } else if (result == JOptionPane.NO_OPTION) {
             System.out.println("she rejected you...");
         }

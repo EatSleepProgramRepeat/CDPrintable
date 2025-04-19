@@ -80,65 +80,69 @@ public class MusicBrainzLabelGenerator implements Printable {
         g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
         g2d.setColor(Color.BLACK);
 
-        // Set font and metrics
         Font font = new Font("Arial", Font.PLAIN, fontSize);
         g2d.setFont(font);
         FontMetrics fontMetrics = g2d.getFontMetrics();
 
-        // Determine how many lines a sheet of paper can hold
-        double paperMaxLines = Math.floor(((pageHeight * 72) - marginTop - marginBottom) / fontSize);
-        System.out.println("paperMaxLines=" + paperMaxLines);
+        double lineHeight = fontMetrics.getHeight();
+        double maxLinesPerPage = Math.floor(((pageHeight * 72) - marginTop - marginBottom) / lineHeight);
 
-        // Find label max height in lines
-        double labelLineMaxHeight = Math.floor((double) LABEL_MAX_HEIGHT / fontSize);
-        System.out.println("labelLineMaxHeight=" + labelLineMaxHeight);
+        ArrayList<ArrayList<String>> releasesAsLines = new ArrayList<>();
+        ArrayList<String> currentReleaseLines = new ArrayList<>();
 
-        // Make an array of the lines for the releases
-        ArrayList<String> lines = new ArrayList<>();
         for (MusicBrainzFinalizedRelease release : finalizedReleaseList) {
-            lines.add(release.getTitle());
-            lines.add(release.getArtist());
-            StringBuilder finalLine = new StringBuilder();
+            ArrayList<String> releaseLines = new ArrayList<>();
+            releaseLines.add(release.getTitle());
+            releaseLines.add(release.getArtist());
+
             StringBuilder lineBuilder = new StringBuilder();
             for (MusicBrainzTrack track : release.getTracks()) {
                 String line = track.getTrackNumber() + ". " + track.getTitle() + " ";
-                if (fontMetrics.stringWidth(line + lineBuilder) > LABEL_WIDTH) {
-                    lineBuilder.append("\n");
-                    lines.add(lineBuilder.toString());
-                    lineBuilder.delete(0, lineBuilder.length());
+                if (fontMetrics.stringWidth(lineBuilder + line) > LABEL_WIDTH) {
+                    releaseLines.add(lineBuilder.toString());
+                    lineBuilder = new StringBuilder();
                 }
                 lineBuilder.append(line);
             }
-            lines.add(lineBuilder.toString());
-            lines.add("");
-            System.out.println(lines.toString());
-        }
-
-        // Get empty lines to find where releases start/end
-        ArrayList<Integer> emptyLines = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i++) {
-            if (lines.get(i).isEmpty()) {
-                emptyLines.add(i);
+            if (!lineBuilder.isEmpty()) {
+                releaseLines.add(lineBuilder.toString());
             }
+
+            releaseLines.add(""); // spacer line
+            releasesAsLines.add(releaseLines);
         }
 
-        System.out.println("emptyLines=" + emptyLines);
+        // Group releases into pages
+        ArrayList<ArrayList<ArrayList<String>>> pages = new ArrayList<>();
+        ArrayList<ArrayList<String>> currentPage = new ArrayList<>();
+        int currentLineCount = 0;
 
-        int startLine = (int) (pageIndex * paperMaxLines);
-        double endLine = Math.min(startLine + paperMaxLines, lines.size());
+        for (ArrayList<String> releaseLines : releasesAsLines) {
+            if (currentLineCount + releaseLines.size() > maxLinesPerPage && !currentPage.isEmpty()) {
+                pages.add(currentPage);
+                currentPage = new ArrayList<>();
+                currentLineCount = 0;
+            }
+            currentPage.add(releaseLines);
+            currentLineCount += releaseLines.size();
+        }
 
-        if (startLine > lines.size()) {
+        if (!currentPage.isEmpty()) {
+            pages.add(currentPage);
+        }
+
+        // Handle page out of bounds
+        if (pageIndex >= pages.size()) {
             return NO_SUCH_PAGE;
         }
 
+        // Draw the releases for this page
         int y = 0;
-
-        // Draw. Every. Dang. Line
-        // ALERT! The code below stops you from pulling girls. Wait, that's the whole codebase!
-        for (int i = startLine; i < endLine; i++) {
-            String line = lines.get(i);
-            g2d.drawString(line, 0, y + fontMetrics.getAscent());
-            y += fontMetrics.getHeight();
+        for (ArrayList<String> releaseLines : pages.get(pageIndex)) {
+            for (String line : releaseLines) {
+                g2d.drawString(line, 0, y + fontMetrics.getAscent());
+                y += fontMetrics.getHeight();
+            }
         }
 
         return PAGE_EXISTS;
@@ -201,45 +205,57 @@ public class MusicBrainzLabelGenerator implements Printable {
         double imageableHeight = paper.getImageableHeight();
 
         // Calculate margins
-        double leftMargin = imageableX;
         double rightMargin = paperWidth - (imageableX + imageableWidth);
-        double topMargin = imageableY;
         double bottomMargin = paperHeight - (imageableY + imageableHeight);
 
-        return new double[]{leftMargin, rightMargin, topMargin, bottomMargin};
+        return new double[]{imageableX, rightMargin, imageableY, bottomMargin};
     }
 
-    public void displayPageAsImage() {
+    public void displayPagesAsImages() {
         try {
-            // Create a PrinterJob and PageFormat
+            // Create PrinterJob and PageFormat
             PrinterJob job = PrinterJob.getPrinterJob();
             PageFormat pageFormat = job.defaultPage();
-
-            // Define the image dimensions based on the paper size
             Paper paper = pageFormat.getPaper();
+
+            // Define image dimensions based on paper size
             int width = (int) paper.getWidth();
             int height = (int) paper.getHeight();
 
-            // Create a BufferedImage
-            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2d = image.createGraphics();
+            // Go through each page index until NO_SUCH_PAGE is returned
+            int pageIndex = 0;
+            while (true) {
+                // Create BufferedImage and draw page content
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = image.createGraphics();
 
-            // Set up the Graphics2D object
-            g2d.setColor(Color.WHITE);
-            g2d.fillRect(0, 0, width, height);
+                // White background
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, 0, width, height);
 
-            // Render the page content
-            this.print(g2d, pageFormat, 0);
-            g2d.dispose();
+                int result = this.print(g2d, pageFormat, pageIndex);
+                g2d.dispose();
 
-            // Create an ImageIcon from the BufferedImage
-            ImageIcon pageIcon = new ImageIcon(image);
+                // If there's no such page, break out of the loop
+                if (result != Printable.PAGE_EXISTS) {
+                    break;
+                }
 
-            // Display the image in a JOptionPane
-            JOptionPane.showMessageDialog(null, new JLabel(pageIcon), "Page Preview", JOptionPane.PLAIN_MESSAGE);
+                // Show the image in a JOptionPane
+                ImageIcon icon = new ImageIcon(image);
+                JOptionPane.showMessageDialog(
+                        null,
+                        new JLabel(icon),
+                        "Page Preview - Page " + (pageIndex + 1),
+                        JOptionPane.PLAIN_MESSAGE
+                );
+
+                pageIndex++;
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "An error occurred while generating the page image.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "An error occurred while generating page images.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 }
