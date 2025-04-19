@@ -30,6 +30,7 @@ public class ProgramWindow {
     private final JPanel cdSearchPanel = new JPanel();
     private final JLabel searchStatusLabel = new JLabel("Status: Nothing's going on.");
     private static final ArrayList<String> idList = new ArrayList<>();
+    private final MusicBrainzLabelGenerator labelGenerator = new MusicBrainzLabelGenerator();
 
     /**
      * Creates a new ProgramWindow and sets up the GUI.
@@ -272,7 +273,7 @@ public class ProgramWindow {
         userAgentPanel.setBorder(BorderFactory.createTitledBorder("User Agent"));
 
         // Setup user agent text fields, labels, and document listeners
-        JLabel userAgentLabel = new JLabel("User Agent (this dosen't save):");
+        JLabel userAgentLabel = new JLabel("User Agent (this doesn't save):");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
         userAgentField.addActionListener(_ -> userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel));
@@ -402,10 +403,11 @@ public class ProgramWindow {
                 if (col == 0) {
                     response = sendRequest(typeOfTable.equals("Disc Name") ? "tracks" : "release", idList.get(row), true);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
-                    model = reader.getTracksAsTableModel(typeOfTable.equals("Disc Name") ? reader.getTracks() : reader.getReleaseTracks());
+                    MusicBrainzTrack[] tracks = typeOfTable.equals("Disc Name") ? reader.getTracks() : reader.getReleaseTracks();
+                    model = reader.getTracksAsTableModel(tracks);
                     String date = typeOfTable.equals("Release Name") ? table.getValueAt(row, 3).toString() : null;
                     createTrackDialog(table.getValueAt(row, 0).toString(), table.getValueAt(row, 1).toString(),
-                            Integer.parseInt(table.getValueAt(row, 2).toString()), date, model);
+                            Integer.parseInt(table.getValueAt(row, 2).toString()), date, model, tracks);
                 } else if (col == 1) {
                     response = sendRequest("artist", table.getValueAt(row, 1).toString(), false);
                     MusicBrainzJSONReader reader = new MusicBrainzJSONReader(response);
@@ -428,13 +430,13 @@ public class ProgramWindow {
      * @param date The date of the release. CDStubs typically do not have a date.
      * @param model The table model to use for the track list.
      */
-    private void createTrackDialog(String title, String artist, int trackCount, String date, DefaultTableModel model) {
+    private void createTrackDialog(String title, String artist, int trackCount, String date, DefaultTableModel model, MusicBrainzTrack[] tracks) {
         // Set up panels
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Add labels to panel
+        // Add labels to the panel
         panel.add(new JLabel("Title: " + title));
         panel.add(new JLabel("Artist: " + artist));
         panel.add(new JLabel("Track Count: " + trackCount));
@@ -444,18 +446,18 @@ public class ProgramWindow {
 
         // Add the label panel to the main panel
         mainPanel.add(panel, BorderLayout.NORTH);
-        // Add table to the main panel
+        // Add the table to the main panel
         JTable trackTable = new JTable(model);
         JScrollPane trackScrollPane = new JScrollPane(trackTable);
         mainPanel.add(trackScrollPane, BorderLayout.CENTER);
-        // Add bottom (question) label to the main panel
+        // Add the bottom (question) label to the main panel
         mainPanel.add(new JLabel("Would you like to add this record to your CD label?"), BorderLayout.SOUTH);
         setSearchStatus("All done!", "green");
 
         // Show dialog
         int result = JOptionPane.showConfirmDialog(null, mainPanel, "Tracks", JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
-            System.out.println("ask her out");
+            labelGenerator.addRelease(new MusicBrainzFinalizedRelease(title, artist, tracks));
         } else if (result == JOptionPane.NO_OPTION) {
             System.out.println("she rejected you...");
         }
