@@ -35,7 +35,14 @@ public class ConfigManager {
         try {
             if (file.createNewFile()) {
                 JOptionPane.showMessageDialog(null, "Config file created. Welcome to CDPrintable!", "Welcome", JOptionPane.INFORMATION_MESSAGE);
-                Files.writeString(file.toPath(), "{\"userAgentWebAddress\": \"https://github.com/EatSleepProgramRepeat/CDPrintable\"}");
+                Files.writeString(file.toPath(), "{}");
+                setProperty("userAgentWebAddress", "https://github.com/EatSleepProgramRepeat/CDPrintable");
+                setProperty("font", "Arial");
+                setIntProperty("fontSize", 10);
+                setDoubleProperty("paperWidth", 8.5);
+                setDoubleProperty("paperHeight", 11);
+                setDoubleProperty("labelWidth", 4);
+                setDoubleProperty("labelMaxHeight", 2);
             }
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "oopsie poopsies", "Error", JOptionPane.ERROR_MESSAGE);
@@ -59,11 +66,91 @@ public class ConfigManager {
     }
 
     /**
+     * Reads a property from the config file.
+     * @param key The key to read.
+     * @param defaultValue The default to return if it doesn't exist.
+     * @return The requested property.
+     */
+    public static String getProperty(String key, String defaultValue) {
+        readConfigFile();
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            return jsonObject.has(key) ? jsonObject.get(key).getAsString() : defaultValue;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading property from config file!", "Error", JOptionPane.ERROR_MESSAGE);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Reads an integer property from the config.
+     * @param key The key to read.
+     * @param defaultValue The default to return if it doesn't exist.
+     * @return The requested int.
+     */
+    public static int getIntProperty(String key, int defaultValue) {
+        readConfigFile();
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            return jsonObject.has(key) ? jsonObject.get(key).getAsInt() : defaultValue;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading property from config file!", "Error", JOptionPane.ERROR_MESSAGE);
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Reads a double property from the config.
+     * @param key The key to read.
+     * @param defaultValue The default to return if it doesn't exist.
+     * @return The requested double.
+     */
+    public static double getDoubleProperty(String key, double defaultValue) {
+        readConfigFile();
+        try {
+            JsonElement jsonElement = JsonParser.parseString(json);
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            return jsonObject.has(key) ? jsonObject.get(key).getAsDouble() : defaultValue;
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error reading property from config file!", "Error", JOptionPane.ERROR_MESSAGE);
+            return defaultValue;
+        }
+    }
+
+    /**
      * Sets a property in the config file.
      * @param key The key to set.
      * @param value The value to set.
      */
     public static void setProperty(String key, String value) {
+        readConfigFile();
+        JsonElement jsonElement = JsonParser.parseString(json);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        jsonObject.addProperty(key, value);
+        writeConfigFile(jsonObject);
+    }
+
+    /**
+     * Sets an int in the config file.
+     * @param key The key to set.
+     * @param value The value to set.
+     */
+    public static void setIntProperty(String key, int value) {
+        readConfigFile();
+        JsonElement jsonElement = JsonParser.parseString(json);
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        jsonObject.addProperty(key, value);
+        writeConfigFile(jsonObject);
+    }
+
+    /**
+     * Sets a double in the config file.
+     * @param key The key to set.
+     * @param value The value to set.
+     */
+    public static void setDoubleProperty(String key, double value) {
         readConfigFile();
         JsonElement jsonElement = JsonParser.parseString(json);
         JsonObject jsonObject = jsonElement.getAsJsonObject();

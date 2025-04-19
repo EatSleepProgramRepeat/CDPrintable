@@ -23,10 +23,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class ProgramWindow {
     private final UserAgent userAgent;
-    private JLabel fullUserAgentLabel = new JLabel();
     private final JPanel cdSearchPanel = new JPanel();
     private final JLabel searchStatusLabel = new JLabel("Status: Nothing's going on.");
     private static final ArrayList<String> idList = new ArrayList<>();
@@ -263,7 +263,7 @@ public class ProgramWindow {
      * @return A JPanel with the settings window.
      */
     private JPanel settingsPanel() {
-        JPanel panel = new JPanel(new GridLayout(1, 2));
+        JPanel panel = new JPanel(new BorderLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -276,28 +276,79 @@ public class ProgramWindow {
         JLabel userAgentLabel = new JLabel("User Agent (this doesn't save):");
         JTextField userAgentField = new JTextField(15);
         userAgentField.setText(userAgent.getUserAgent());
-        userAgentField.addActionListener(_ -> userAgent.setUserAgent(userAgentField.getText(), fullUserAgentLabel));
+        userAgentField.addActionListener(_ -> userAgent.setUserAgent(userAgentField.getText(), true));
 
         // Set up the user agent field with labels and document listener.
         JLabel userAgentWebAddressLabel = new JLabel("User Agent Web Address:");
         JTextField userAgentWebAddressField = new JTextField(15);
         userAgentWebAddressField.setText(userAgent.getUserAgentWebAddress());
         userAgentWebAddressField.addActionListener(_ -> {
-            userAgent.setUserAgentWebAddress(userAgentWebAddressField.getText(), fullUserAgentLabel);
+            userAgent.setUserAgentWebAddress(userAgentWebAddressField.getText(), true);
             ConfigManager.setProperty("userAgentWebAddress", userAgentWebAddressField.getText());
         });
 
-        fullUserAgentLabel = new JLabel(userAgent.toString());
-
         // Font settings
-        JPanel fontPanel = new JPanel(new GridBagLayout());
-        fontPanel.setBorder(BorderFactory.createTitledBorder("Font"));
+        JPanel printerPanel = new JPanel(new GridBagLayout());
+        printerPanel.setBorder(BorderFactory.createTitledBorder("Printer Settings (Units are in inches)"));
 
         JLabel fontLabel = new JLabel("Font:");
         JTextField fontField = new JTextField(30);
+        fontField.setText(ConfigManager.getProperty("font"));
+        fontField.addActionListener(_ -> {
+            ConfigManager.setProperty("font", fontField.getText());
+            labelGenerator.setFontName(fontField.getText());
+        });
 
         JLabel fontSizeLabel = new JLabel("Font Size:");
         JTextField fontSizeField = new JTextField(30);
+        fontSizeField.setText(ConfigManager.getProperty("fontSize"));
+        fontSizeField.addActionListener(_ -> validateAndSetDoubleField(
+                fontSizeField,
+                labelGenerator::setFontSize,
+                "fontSize",
+                "Font Size"
+        ));
+
+        JLabel paperWidthLabel = new JLabel("Paper Width:");
+        JTextField paperWidthField = new JTextField(30);
+        paperWidthField.setText(ConfigManager.getProperty("paperWidth"));
+        paperWidthField.addActionListener(_ -> validateAndSetDoubleField(
+                paperWidthField,
+                labelGenerator::setPageWidth,
+                "paperWidth",
+                "Paper Width"
+        ));
+
+
+        JLabel paperHeightLabel = new JLabel("Paper Height:");
+        JTextField paperHeightField = new JTextField(30);
+        paperHeightField.setText(ConfigManager.getProperty("paperHeight"));
+        paperHeightField.addActionListener(_ -> validateAndSetDoubleField(
+                paperHeightField,
+                labelGenerator::setPageHeight,
+                "paperHeight",
+                "Paper Height"
+        ));
+
+        JLabel labelWidthLabel = new JLabel("Label Width:");
+        JTextField labelWidthField = new JTextField(30);
+        labelWidthField.setText(ConfigManager.getProperty("labelWidth"));
+        labelWidthField.addActionListener(_ -> validateAndSetDoubleField(
+                labelWidthField,
+                labelGenerator::setLabelWidth,
+                "labelWidth",
+                "Label Width"
+        ));
+
+        JLabel labelMaxHeightLabel = new JLabel("Label Max Height:");
+        JTextField labelMaxHeightField = new JTextField(30);
+        labelMaxHeightField.setText(ConfigManager.getProperty("labelMaxHeight"));
+        labelMaxHeightField.addActionListener(_ -> validateAndSetDoubleField(
+                labelMaxHeightField,
+                labelGenerator::setLabelMaxHeight,
+                "labelHeight",
+                "Label Max Height"
+        ));
         
         JPanel userAgentInputPanel = new JPanel(new GridBagLayout());
         JPanel fullAgentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -306,32 +357,45 @@ public class ProgramWindow {
         gbc.gridx = 0;
         gbc.gridy = 0;
         userAgentInputPanel.add(userAgentLabel, gbc);
-        fontPanel.add(fontLabel, gbc);
-
+        printerPanel.add(fontLabel, gbc);
         gbc.gridx = 1;
         userAgentInputPanel.add(userAgentField, gbc);
-        fontPanel.add(fontField, gbc);
-
+        printerPanel.add(fontField, gbc);
         gbc.gridx = 0;
         gbc.gridy = 1;
         userAgentInputPanel.add(userAgentWebAddressLabel, gbc);
-        fontPanel.add(fontSizeLabel, gbc);
-
+        printerPanel.add(fontSizeLabel, gbc);
         gbc.gridx = 1;
         userAgentInputPanel.add(userAgentWebAddressField, gbc);
-        fontPanel.add(fontSizeField, gbc);
-
-        userAgentInputPanel.add(fullUserAgentLabel, gbc);
-        fullAgentPanel.add(fullUserAgentLabel);
+        printerPanel.add(fontSizeField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        printerPanel.add(paperWidthLabel, gbc);
+        gbc.gridx = 1;
+        printerPanel.add(paperWidthField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        printerPanel.add(paperHeightLabel, gbc);
+        gbc.gridx = 1;
+        printerPanel.add(paperHeightField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        printerPanel.add(labelWidthLabel, gbc);
+        gbc.gridx = 1;
+        printerPanel.add(labelWidthField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        printerPanel.add(labelMaxHeightLabel, gbc);
+        gbc.gridx = 1;
+        printerPanel.add(labelMaxHeightField, gbc);
 
         // Add panels to the UA main panel
         userAgentPanel.add(fullAgentPanel, BorderLayout.NORTH);
         userAgentPanel.add(userAgentInputPanel, BorderLayout.CENTER);
-        userAgentPanel.add(new JLabel("Press enter to save settings anywhere."), BorderLayout.SOUTH);
-
         // Add subpanels to the main panel
-        panel.add(userAgentPanel);
-        panel.add(fontPanel);
+        panel.add(new JLabel("<html><font color=\"green\">Press enter to save settings anywhere.</font></html>"), BorderLayout.NORTH);
+        panel.add(userAgentPanel, BorderLayout.WEST);
+        panel.add(printerPanel, BorderLayout.EAST);
 
         return panel;
     }
@@ -493,4 +557,37 @@ public class ProgramWindow {
             return cell;
         }
     }
+
+    /**
+     * Helper method to make sure that an int field is valid.
+     * @param field The field.
+     * @param setter The method in MusicBrainzLabelGenerator that takes an int.
+     * @param configKey the JSON config key.
+     * @param fieldName The field name.
+     */
+    private void validateAndSetDoubleField(JTextField field, Consumer<Double> setter, String configKey, String fieldName) {
+        String input = field.getText().trim();
+
+        if (input.isEmpty()) {
+            showError(fieldName + " cannot be empty.");
+            return;
+        }
+
+        try {
+            double value = Double.parseDouble(input);
+            if (value <= 0) {
+                showError(fieldName + " must be a positive number.");
+                return;
+            }
+            setter.accept(value);
+            ConfigManager.setDoubleProperty(configKey, value);
+        } catch (NumberFormatException e) {
+            showError("Please enter a valid whole number for " + fieldName + ".");
+        }
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
 }
