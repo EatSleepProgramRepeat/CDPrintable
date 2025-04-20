@@ -12,10 +12,10 @@ package com.CDPrintable;
 
 import com.CDPrintable.MusicBrainzResources.MusicBrainzLabelGenerator;
 
+import java.awt.*;
+
 public class Main {
     public static void main(String[] args) {
-//        MusicBrainzLabelGenerator lg = new MusicBrainzLabelGenerator();
-//        lg.displayPageAsImage();
         ProgramWindow window = new ProgramWindow();
     }
 }
