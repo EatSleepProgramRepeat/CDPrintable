@@ -99,6 +99,8 @@ public class ProgramWindow {
 
         // Make a JScrollPane for the image panel
         JScrollPane imageScrollPane = new JScrollPane(imagePanel);
+        imageScrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        imageScrollPane.getHorizontalScrollBar().setUnitIncrement(20);
 
         // Add buttons to the button panel
         buttonPanel.add(refreshButton);
