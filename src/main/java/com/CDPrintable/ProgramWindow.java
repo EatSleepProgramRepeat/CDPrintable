@@ -97,7 +97,7 @@ public class ProgramWindow {
             }
         });
 
-        // Make a JSCrollPane for the image panel
+        // Make a JScrollPane for the image panel
         JScrollPane imageScrollPane = new JScrollPane(imagePanel);
 
         // Add buttons to the button panel
@@ -108,7 +108,7 @@ public class ProgramWindow {
         imagePanel.setBorder(BorderFactory.createTitledBorder("Preview"));
 
 
-        // Add subpanels to main panel
+        // Add subpanels to the main panel
         panel.add(imageScrollPane, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.NORTH);
 
@@ -151,6 +151,7 @@ public class ProgramWindow {
 
         // Make the input field
         JTextField searchField = new JTextField(15);
+        JTextField artistField = new JTextField(15);
 
         // Search type combo box setup
         JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
@@ -173,9 +174,24 @@ public class ProgramWindow {
             setSearchStatus("Performing search...", "blue");
             clearIdList();
             String finalSelectedItem = selectedItem;
+            String finalQuery;
+            if (!selectedItem.equals("Artist")) {
+                // It works. Don't touch it. Please. I beg you.
+                finalQuery = searchField.getText().isEmpty() && artistField.getText().isEmpty()
+                        ? ""
+                        : (!searchField.getText().isEmpty()
+                        ? (selectedItem.equals("CDStub") ? "title:" : "release:") + searchField.getText()
+                        : "")
+                        + (!searchField.getText().isEmpty() && !artistField.getText().isEmpty() ? " AND " : "")
+                        + (!artistField.getText().isEmpty() ? "artist:" + artistField.getText() : "");
+            } else {
+                finalQuery = artistField.getText();
+            }
+            // thanks Java I TOTALLY wanted to make a new var here.
+            String finalFinalQuery = finalQuery;
             Constants.THREAD_MANAGER.submit(() -> {
                 int[] columnsToHighlight = null;
-                MusicBrainzJSONReader reader = new MusicBrainzJSONReader(sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), searchField.getText(), false));
+                MusicBrainzJSONReader reader = new MusicBrainzJSONReader(sendRequest(finalSelectedItem.toLowerCase(Locale.ROOT), finalFinalQuery, false));
                 switch (finalSelectedItem) {
                     case "CDStub" -> {
                         columnsToHighlight = new int[]{0, 1};
@@ -218,10 +234,14 @@ public class ProgramWindow {
 
         // Set up enter key and text box
         searchField.addActionListener(_ -> searchButton.doClick());
+        artistField.addActionListener(_ -> searchButton.doClick());
 
         cdSearchPanel.setLayout(new FlowLayout());
         cdSearchPanel.add(searchTypeComboBox);
+        cdSearchPanel.add(new JLabel("Title:"));
         cdSearchPanel.add(searchField);
+        cdSearchPanel.add(new JLabel("Artist:"));
+        cdSearchPanel.add(artistField);
         cdSearchPanel.add(searchButton);
 
         // Add the CD Search panel to the main panel
