@@ -19,6 +19,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -48,12 +49,12 @@ public class ProgramWindow {
         frame.setLayout(new BorderLayout());
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        JPanel tablePanel = tablePanel();
+        JPanel previewPanel = previewPanel();
         JPanel findCDPanel = searchPanel();
         JPanel settingsPanel = settingsPanel();
 
         tabbedPane.addTab("Search", findCDPanel);
-        tabbedPane.addTab("Table", tablePanel);
+        tabbedPane.addTab("Preview", previewPanel);
         tabbedPane.addTab("Settings", settingsPanel);
 
         frame.add(tabbedPane, BorderLayout.CENTER);
@@ -66,16 +67,50 @@ public class ProgramWindow {
      * Gets a JPanel for the table panel. This is a helper method.
      * @return A JPanel with the table panel.
      */
-    private JPanel tablePanel() {
+    private JPanel previewPanel() {
+        // Set up panels
         JPanel panel = new JPanel(new BorderLayout());
+        JPanel imagePanel = new JPanel();
+        imagePanel.setLayout(new BoxLayout(imagePanel, BoxLayout.Y_AXIS));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        // Set up all the tables for the cd
-        String[] columnNames = {"CD Name", "Artist", "Genre", "Year", "Track Count"};
-        JTable table = new JTable(new String[][] {new String[] {"None", "", "", "", ""}}, columnNames);
-        JScrollPane scrollPane = new JScrollPane(table);
+        // Set up buttons
+        JButton refreshButton = new JButton("Refresh Preview");
+        JButton printButton = new JButton("Print");
+        refreshButton.addActionListener(_ -> {
+            imagePanel.removeAll();
+            BufferedImage[] images = labelGenerator.getAsBufferedImages();
+            for (BufferedImage image : images) {
+                JLabel label = new JLabel(new ImageIcon(image));
+                label.setAlignmentX(Component.CENTER_ALIGNMENT);
+                imagePanel.add(label);
+                imagePanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            }
+            imagePanel.repaint();
+            imagePanel.revalidate();
+        });
+        printButton.addActionListener(_ -> {
+            try {
+                labelGenerator.printLabel();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "An error occurred while printing. More info: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
 
-        // Set up the panel
-        panel.add(scrollPane, BorderLayout.CENTER);
+        // Make a JSCrollPane for the image panel
+        JScrollPane imageScrollPane = new JScrollPane(imagePanel);
+
+        // Add buttons to the button panel
+        buttonPanel.add(refreshButton);
+        buttonPanel.add(printButton);
+
+        // Set up the image panel
+        imagePanel.setBorder(BorderFactory.createTitledBorder("Preview"));
+
+
+        // Add subpanels to main panel
+        panel.add(imageScrollPane, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.NORTH);
 
         return panel;
     }
@@ -589,5 +624,4 @@ public class ProgramWindow {
     private void showError(String message) {
         JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
-
 }
