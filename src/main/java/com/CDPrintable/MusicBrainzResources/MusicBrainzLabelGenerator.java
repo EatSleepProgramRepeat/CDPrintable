@@ -16,7 +16,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.print.*;
-import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class MusicBrainzLabelGenerator implements Printable {
@@ -56,7 +55,7 @@ public class MusicBrainzLabelGenerator implements Printable {
         this.fontSize = ConfigManager.getDoubleProperty("fontSize", 10);
         this.pageWidth = ConfigManager.getDoubleProperty("pageWidth", 8.5);
         this.pageHeight = ConfigManager.getDoubleProperty("pageHeight", 11);
-        this.fontName = ConfigManager.getProperty("fontName", "Arial");
+        this.fontName = ConfigManager.getProperty("font", "Arial");
 
     }
 
