@@ -16,6 +16,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.print.*;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class MusicBrainzLabelGenerator implements Printable {
@@ -244,12 +245,55 @@ public class MusicBrainzLabelGenerator implements Printable {
         }
     }
 
+    public BufferedImage[] getAsBufferedImages() {
+        ArrayList<BufferedImage> images = new ArrayList<>();
+        try {
+            // Create PrinterJob and PageFormat
+            PrinterJob job = PrinterJob.getPrinterJob();
+            PageFormat pageFormat = job.defaultPage();
+            Paper paper = pageFormat.getPaper();
+
+            // Define image dimensions based on paper size
+            int width = (int) paper.getWidth();
+            int height = (int) paper.getHeight();
+
+            // Go through each page index until NO_SUCH_PAGE is returned
+            int pageIndex = 0;
+            while (true) {
+                // Create BufferedImage and draw page content
+                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = image.createGraphics();
+
+                // White background
+                g2d.setColor(Color.WHITE);
+                g2d.fillRect(0, 0, width, height);
+
+                int result = this.print(g2d, pageFormat, pageIndex);
+                g2d.dispose();
+
+                // If there's no such page, break out of the loop
+                if (result != Printable.PAGE_EXISTS) {
+                    break;
+                }
+
+                // Add the image to the list
+                images.add(image);
+
+                pageIndex++;
+            }
+            return images.toArray(new BufferedImage[images.size()]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return images.toArray(new BufferedImage[0]);
+    }
+
     public double getLabelWidth() {
         return labelWidth;
     }
 
     public void setLabelWidth(double labelWidth) {
-        this.labelWidth = labelWidth;
+        this.labelWidth = labelWidth * dpiX;
     }
 
     public double getLabelMaxHeight() {
@@ -257,7 +301,7 @@ public class MusicBrainzLabelGenerator implements Printable {
     }
 
     public void setLabelMaxHeight(double labelMaxHeight) {
-        this.labelMaxHeight = labelMaxHeight;
+        this.labelMaxHeight = labelMaxHeight * dpiY;
     }
 
     public double getFontSize() {
