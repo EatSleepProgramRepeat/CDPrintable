@@ -9,9 +9,6 @@
 
 CDPrintable is a lightweight, easy-to-use program for generating and printing labels with CD track listings for your CD collection.
 
-> [!NOTE]\
-> **This project is still in development.** There is a bunch of stuff that might not work, and some things that are planned but not implemented yet. Please bear with me because I am working alone on this project.
-
 ## 🎯 Features
 - 🔍 Automatically fetches and tables information from the MusicBrainz database.
 - 🖨️ Generates a printable image with the track listings.
@@ -79,7 +76,6 @@ This page is not done yet, so expect more settings as the program develops.
 ### Configuration File
 
 The configuration file is located in the users home directory in a subdirectory called 'CDPrintable'.
-
 The configuration file is a JSON file that contains the following fields:
 - `userAgent`: The user agent that the program will use to make requests to the MusicBrainz API.
 - `printerFont`: The font that the program will use to print the labels.
@@ -96,9 +92,9 @@ The configuration file is a JSON file that contains the following fields:
 - [Google Gson](https://github.com/google/gson) - JSON parsing.
 
 ## 📦 Roadmap
-- [ ] Add more settings to the settings page.
-- [ ] Printer communication.
-- [ ] Search for albums, releases, and CDStubs by artists.
+- [X] Add more settings to the settings page.
+- [X] Printer communication.
+- [X] Search for albums, releases, and CDStubs by artists.
 
 ## 📜 License
 
