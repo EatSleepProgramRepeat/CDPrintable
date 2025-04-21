@@ -130,7 +130,7 @@ public class ProgramWindow {
         trackListPanel.setBorder(BorderFactory.createTitledBorder("Search Results"));
 
         // Search table set up
-        JTable searchTable = new JTable(getTableModel("CDStub"));
+        JTable searchTable = new JTable(getTableModel("Release"));
         searchTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -156,7 +156,12 @@ public class ProgramWindow {
         JTextField artistField = new JTextField(15);
 
         // Search type combo box setup
-        JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"CDStub", "Artist", "Release"});
+        JComboBox<String> searchTypeComboBox = new JComboBox<>(new String[] {"Release", "Artist", "CDStub"});
+        searchTypeComboBox.addActionListener(_ -> {
+            if (searchTypeComboBox.getSelectedItem() != null && searchTypeComboBox.getSelectedItem().equals("CDStub")) {
+                JOptionPane.showMessageDialog(null, "CDStubs do not have track numbers. Because of this, they will all be shown as track 0.", "Warning", JOptionPane.WARNING_MESSAGE);
+            }
+        });
 
         // Search button and event listener setup
         JButton searchButton = new JButton("Search");
